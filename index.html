@@ -1,978 +1,652 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#dc2626">
-    <title>Campeonato de Kart</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding-bottom: 50px;
-        }
-
-        .container { max-width: 1200px; margin: 0 auto; padding: 15px; }
-        
-        .card {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        h1, h2, h3 { color: #333; margin-bottom: 15px; }
-        
-        .btn {
-            background: #dc2626;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 10px;
-            font-weight: 600;
-        }
-
-        .btn:active { background: #b91c1c; }
-        .btn-secondary { background: #3b82f6; }
-        .btn-success { background: #10b981; }
-        .btn-small { padding: 6px 12px; width: auto; font-size: 14px; }
-
-        input, select, textarea {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid #e5e7eb;
-            border-radius: 8px;
-            font-size: 16px;
-            margin-bottom: 12px;
-        }
-
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: #dc2626;
-        }
-
-        .login-container {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .login-card {
-            background: white;
-            border-radius: 12px;
-            padding: 40px;
-            max-width: 400px;
-            width: 100%;
-            box-shadow: 0 20px 25px rgba(0,0,0,0.15);
-        }
-
-        .logo { text-align: center; font-size: 64px; margin-bottom: 20px; }
-        
-        .nav-btn {
-            display: block;
-            width: 100%;
-            text-align: left;
-            padding: 12px 15px;
-            background: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            margin-bottom: 5px;
-        }
-
-        .nav-btn:active, .nav-btn.active { background: #f3f4f6; font-weight: 600; }
-        
-        .item {
-            background: #f9fafb;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .del-btn {
-            background: #ef4444;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        .hidden { display: none !important; }
-        
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; overflow-x: auto; display: block; }
-        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #e5e7eb; white-space: nowrap; }
-        th { background: #f9fafb; font-weight: 600; position: sticky; top: 0; }
-        
-        .podium { 
-            display: flex; 
-            justify-content: center; 
-            gap: 15px; 
-            margin: 30px 0; 
-            flex-wrap: wrap; 
-        }
-        
-        .podium-item { 
-            text-align: center; 
-            background: white; 
-            padding: 20px; 
-            border-radius: 12px; 
-            min-width: 140px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .stat-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 10px;
-            margin: 15px 0;
-        }
-
-        .stat-card {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-        }
-
-        .stat-number { font-size: 32px; font-weight: bold; }
-        .stat-label { font-size: 13px; opacity: 0.9; margin-top: 5px; }
-
-        .tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 15px;
-            overflow-x: auto;
-        }
-
-        .tab {
-            padding: 10px 20px;
-            background: #e5e7eb;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            white-space: nowrap;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .tab.active { background: #dc2626; color: white; }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 5px;
-            font-size: 14px;
-        }
-
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin: 10px 0;
-        }
-
-        .checkbox-group input[type="checkbox"] {
-            width: auto;
-            margin: 0;
-        }
-
-        @media (max-width: 768px) {
-            .container { padding: 10px; }
-            .card { padding: 15px; }
-            table { font-size: 14px; }
-            th, td { padding: 8px; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#dc2626">
+<title>🏎️ Campeonato de Kart</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#1a1a2e;min-height:100vh;padding-bottom:60px}
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%)}
+.login-box{background:white;border-radius:24px;padding:40px 32px;max-width:440px;width:100%;box-shadow:0 30px 60px rgba(0,0,0,.5)}
+.login-logo{text-align:center;margin-bottom:24px}
+.login-logo .ico{font-size:80px;display:block;line-height:1}
+.login-logo h1{font-size:22px;color:#1a1a2e;font-weight:900;margin-top:10px}
+.login-logo p{font-size:13px;color:#888;margin-top:4px}
+.lfield{margin-bottom:16px}
+.lfield label{display:block;font-size:12px;font-weight:800;color:#555;margin-bottom:7px;text-transform:uppercase;letter-spacing:.6px}
+.lfield input{width:100%;padding:13px 16px;border:2px solid #e5e7eb;border-radius:11px;font-size:16px;background:#fafafa}
+.lfield input:focus{outline:none;border-color:#dc2626;background:white}
+.btn-login{width:100%;padding:14px;background:linear-gradient(135deg,#dc2626,#991b1b);color:white;border:none;border-radius:12px;font-size:17px;font-weight:800;cursor:pointer;margin-top:10px;box-shadow:0 4px 14px rgba(220,38,38,.4)}
+.login-creds{margin-top:20px;border-radius:12px;overflow:hidden;border:1px solid #f3f4f6}
+.cred-row{display:flex;align-items:center;padding:13px 16px;gap:12px}
+.cred-row.ca{background:#fff5f5;border-bottom:1px solid #f3f4f6}
+.cred-row.cp{background:#eff6ff}
+.cred-ico{font-size:22px;width:34px;text-align:center}
+.cred-info strong{display:block;font-size:13px;color:#333}
+.cred-info span{font-size:12px;color:#888}
+.err{background:#fef2f2;border:1px solid #fecaca;color:#dc2626;padding:10px 14px;border-radius:10px;font-size:14px;margin-bottom:14px;text-align:center;display:none}
+.wrap{max-width:1200px;margin:0 auto;padding:15px}
+.hdr{background:linear-gradient(135deg,#1a1a2e,#0f3460);border-radius:16px;padding:16px 20px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.hdr h2{color:white;font-size:17px;font-weight:900;margin:0}
+.hdr p{color:rgba(255,255,255,.55);font-size:13px;margin:4px 0 0}
+.rb{display:inline-block;padding:3px 11px;border-radius:20px;font-size:11px;font-weight:800;text-transform:uppercase;margin-right:6px}
+.rb-a{background:#dc2626;color:white}
+.rb-p{background:#3b82f6;color:white}
+.btn-out{padding:8px 16px;background:rgba(255,255,255,.1);color:white;border:1px solid rgba(255,255,255,.2);border-radius:8px;cursor:pointer;font-size:13px;font-weight:600}
+.nav{background:white;border-radius:14px;padding:10px;margin-bottom:14px;display:flex;flex-wrap:wrap;gap:5px;box-shadow:0 2px 8px rgba(0,0,0,.07)}
+.nb{flex:1;min-width:72px;padding:10px 5px;background:#f9fafb;border:none;border-radius:10px;cursor:pointer;font-size:11px;font-weight:700;color:#666;text-align:center;line-height:1.5}
+.nb.active{background:#dc2626;color:white}
+.nsep{width:100%;height:1px;background:#f3f4f6;margin:3px 0}
+.nlbl{width:100%;font-size:10px;font-weight:800;color:#bbb;text-transform:uppercase;letter-spacing:.6px;padding:2px 4px}
+.card{background:white;border-radius:14px;padding:20px;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,.07)}
+.ct{font-size:18px;font-weight:900;color:#1a1a2e;margin-bottom:18px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:18px}
+.stc{background:linear-gradient(135deg,#1a1a2e,#0f3460);color:white;padding:16px;border-radius:12px;text-align:center}
+.stn{font-size:32px;font-weight:900;line-height:1}
+.stl{font-size:11px;opacity:.75;margin-top:5px;font-weight:600}
+.fsec{background:#f9fafb;border-radius:12px;padding:16px;margin-bottom:16px;border:1px solid #f3f4f6}
+.fsec h3{font-size:13px;font-weight:800;color:#444;margin-bottom:14px;text-transform:uppercase;letter-spacing:.5px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.f label{display:block;font-size:11px;font-weight:800;color:#666;margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px}
+.f input,.f select,.f textarea{width:100%;padding:10px 12px;border:2px solid #e5e7eb;border-radius:8px;font-size:15px;background:white}
+.f input:focus,.f select:focus{outline:none;border-color:#dc2626}
+.f{margin-bottom:12px}
+.btn{padding:12px 18px;border:none;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;width:100%;margin-top:8px}
+.bg{background:#10b981;color:white}
+.br{background:#dc2626;color:white}
+.bb{background:#3b82f6;color:white}
+.bw{background:#e5e7eb;color:#444}
+.bsm{padding:7px 13px;font-size:13px;width:auto;margin:0}
+.li{background:#f9fafb;border-radius:10px;padding:13px 16px;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid #f3f4f6}
+.pnum{width:36px;height:36px;background:#dc2626;color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;flex-shrink:0}
+.catd{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:800}
+.cd{background:#fef3c7;color:#d97706}
+.cb{background:#dbeafe;color:#2563eb}
+.dbtn{padding:6px 12px;background:#fef2f2;color:#dc2626;border:1px solid #fecaca;border-radius:7px;cursor:pointer;font-size:13px;font-weight:700}
+.tabs{display:flex;gap:6px;margin-bottom:16px;overflow-x:auto;padding-bottom:3px}
+.tab{padding:9px 16px;border:none;border-radius:8px;cursor:pointer;white-space:nowrap;font-size:13px;font-weight:700;background:#f3f4f6;color:#666}
+.tab.active{background:#dc2626;color:white}
+.tw{overflow-x:auto;border-radius:10px;border:1px solid #f3f4f6}
+table{width:100%;border-collapse:collapse;min-width:280px}
+th{background:#f9fafb;padding:11px 13px;text-align:left;font-size:12px;font-weight:800;color:#555;border-bottom:2px solid #f3f4f6;white-space:nowrap;text-transform:uppercase;letter-spacing:.3px}
+td{padding:11px 13px;border-bottom:1px solid #f9fafb;font-size:14px;white-space:nowrap}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafafa}
+.pb{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;margin:auto}
+.p1{background:#fef3c7;color:#d97706}.p2{background:#f3f4f6;color:#6b7280}.p3{background:#fdf2e9;color:#c2682e}
+.ptb{font-size:19px;font-weight:900;color:#dc2626}
+.podium{display:flex;justify-content:center;align-items:flex-end;gap:10px;padding:16px 0 28px;flex-wrap:wrap}
+.pp{text-align:center;border-radius:14px;padding:16px 12px;min-width:105px}
+.pp1{background:linear-gradient(135deg,#fef9c3,#fde047);order:2;padding-bottom:28px}
+.pp2{background:linear-gradient(135deg,#f3f4f6,#e5e7eb);order:1;padding-bottom:18px}
+.pp3{background:linear-gradient(135deg,#fdf2e9,#f5c5a3);order:3;padding-bottom:8px}
+.pm{font-size:34px}.pp-pos{font-size:22px;font-weight:900}
+.pp1 .pp-pos{color:#ca8a04}.pp2 .pp-pos{color:#6b7280}.pp3 .pp-pos{color:#c2682e}
+.ppn{font-weight:800;font-size:13px;margin:5px 0 4px;color:#1a1a2e}.ppp{font-size:15px;font-weight:900}
+.pp1 .ppp{color:#ca8a04}
+.stg-card{border:2px solid #f3f4f6;border-radius:12px;padding:16px;margin-bottom:10px;cursor:pointer}
+.stg-card.open{border-color:#dc2626;background:#fff8f8}
+.stg-hdr{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.stg-name{font-weight:900;font-size:15px;color:#1a1a2e}
+.stg-date{font-size:13px;color:#888;margin-top:3px}
+.stg-body{margin-top:14px;border-top:2px solid #f3f4f6;padding-top:14px}
+.sectit{font-size:12px;font-weight:900;color:#1a1a2e;margin:14px 0 8px;padding-bottom:5px;border-bottom:2px solid #f3f4f6;text-transform:uppercase;letter-spacing:.5px}
+.krow{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-radius:8px;background:white;border:1px solid #f3f4f6;margin-bottom:6px}
+.ktag{background:#1a1a2e;color:white;padding:5px 14px;border-radius:20px;font-weight:800;font-size:13px}
+.brow{display:flex;align-items:center;gap:14px;padding:12px 16px;background:#f0fdf4;border-radius:10px;margin-bottom:8px;border:1px solid #bbf7d0}
+.btime{font-size:22px;font-weight:900;color:#16a34a;font-family:monospace}
+.bpilot{font-size:14px;font-weight:700;color:#1a1a2e}
+.bstage{font-size:12px;color:#666;margin-top:2px}
+.pg{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-top:10px}
+.pi{padding:11px;border-radius:10px;text-align:center;font-size:13px;font-weight:700;line-height:1.4}
+.pres{background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0}
+.abs{background:#fef2f2;color:#dc2626;border:1px solid #fecaca}
+.dcl{background:#fff7ed;color:#c2410c;border:1px solid #fed7aa}
+.acc{border:1px solid #f3f4f6;border-radius:11px;margin-bottom:8px;overflow:hidden}
+.ach{padding:13px 16px;background:#f9fafb;cursor:pointer;font-weight:800;display:flex;justify-content:space-between;align-items:center;user-select:none;font-size:14px}
+.acb{padding:16px;display:none}
+.acb.open{display:block}
+.info{padding:12px 14px;border-radius:10px;font-size:13px;margin-bottom:12px;line-height:1.5}
+.ib{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af}
+.ig{background:#f0fdf4;border:1px solid #bbf7d0;color:#166534}
+.iy{background:#fffbeb;border:1px solid #fde68a;color:#92400e}
+.readonly-bar{background:linear-gradient(135deg,#1e40af,#1d4ed8);color:white;border-radius:10px;padding:10px 16px;font-size:13px;font-weight:700;text-align:center;margin-bottom:14px}
+@media(max-width:600px){.frow{grid-template-columns:1fr}.podium{gap:8px}.pp{min-width:95px}.hdr h2{font-size:15px}td,th{padding:8px 10px;font-size:13px}}
+</style>
 </head>
 <body>
-    <div id="app">Carregando...</div>
+<div id="APP">Carregando...</div>
+<script>
+// ====================== BANCO ======================
+const DB={get(k){try{const d=localStorage.getItem(k);return d?JSON.parse(d):null}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 
-    <script>
-        // ===== ARMAZENAMENTO =====
-        const db = {
-            get(k) { 
-                try { 
-                    const d = localStorage.getItem(k); 
-                    return d ? JSON.parse(d) : null; 
-                } catch(e) { 
-                    return null; 
-                } 
-            },
-            set(k, v) { 
-                try { 
-                    localStorage.setItem(k, JSON.stringify(v)); 
-                } catch(e) {
-                    console.error('Erro ao salvar:', e);
-                } 
-            }
-        };
+// ====================== CREDENCIAIS FIXAS ======================
+const CREDS={admin:{u:'admin',p:'admin123'},pilot:{u:'piloto',p:'piloto123'}};
 
-        // ===== ESTADO GLOBAL =====
-        let app = {
-            user: db.get('user'),
-            data: db.get('data') || {
-                name: 'Campeonato de Kart Rental',
-                pilots: [],
-                karts: [],
-                stages: [],
-                points: {
-                    qualifying: [10, 9, 8, 7, 6, 5, 4, 3, 2, 1],
-                    battery: [25, 22, 20, 18, 16, 14, 12, 10, 8, 6, 4, 2],
-                    bestLapBonus: 1,
-                    bestQualifyBonus: 1
-                }
-            },
-            page: 'home',
-            editingStage: null
-        };
+// ====================== ESTADO ======================
+let G={
+  user:DB.get('kart_sess'),page:'standings',
+  editStageId:null,editTab:'draw',editCat:'Dinos',
+  viewCat:'Dinos',standCat:'Dinos',openStageId:null,
+  data:DB.get('kart_data')||{
+    name:'Campeonato de Kart Rental',regulation:'',partners:[],
+    pilots:[],karts:[],stages:[],
+    points:{qualifying:[10,9,8,7,6,5,4,3,2,1],battery:[25,22,20,18,16,14,12,10,8,6,4,2],bestLapBonus:1,bestQualifyBonus:1}
+  }
+};
+function save(){DB.set('kart_data',G.data);DB.set('kart_sess',G.user)}
+function uid(){return 'id'+Date.now()+Math.random().toString(36).substr(2,6)}
 
-        function save() { 
-            db.set('data', app.data); 
-            db.set('user', app.user); 
-        }
+// ====================== AUTH ======================
+function doLogin(e){
+  e.preventDefault();
+  const u=document.getElementById('lU').value.trim().toLowerCase();
+  const p=document.getElementById('lP').value;
+  if(u===CREDS.admin.u&&p===CREDS.admin.p){G.user={role:'admin',name:'Administrador'};G.page='home';save();render();}
+  else if(u===CREDS.pilot.u&&p===CREDS.pilot.p){G.user={role:'pilot',name:'Piloto'};G.page='standings';save();render();}
+  else{const el=document.getElementById('lerr');if(el){el.textContent='Usuário ou senha incorretos!';el.style.display='block';}}
+}
+function logout(){G.user=null;DB.set('kart_sess',null);render()}
+function goto(p){G.page=p;G.editStageId=null;render()}
 
-        function generateId() {
-            return 'id-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
-        }
+// ====================== PILOTOS ======================
+function addPilot(e){
+  e.preventDefault();
+  const name=document.getElementById('pN').value.trim();
+  const num=document.getElementById('pNm').value.trim();
+  const cat=document.getElementById('pC').value;
+  if(!name)return;
+  G.data.pilots.push({id:uid(),name,number:num||null,cat});
+  save();render();
+}
+function delPilot(id){if(!confirm('Excluir piloto?'))return;G.data.pilots=G.data.pilots.filter(p=>p.id!==id);save();render();}
 
-        // ===== AUTENTICAÇÃO =====
-        function login(e) {
-            e.preventDefault();
-            const u = document.getElementById('user').value;
-            const p = document.getElementById('pass').value;
-            if (u === 'admin' && p === 'admin123') {
-                app.user = { name: 'admin', role: 'admin' };
-                save();
-                render();
-            } else {
-                alert('Login incorreto!');
-            }
-        }
+// ====================== KARTS ======================
+function addKart(e){
+  e.preventDefault();
+  const num=document.getElementById('kN').value.trim();
+  if(!num)return;
+  if(G.data.karts.find(k=>k.num===num))return alert('Kart '+num+' ja cadastrado!');
+  G.data.karts.push({id:uid(),num});save();render();
+}
+function delKart(id){G.data.karts=G.data.karts.filter(k=>k.id!==id);save();render();}
 
-        function logout() { 
-            app.user = null; 
-            save(); 
-            render(); 
-        }
+// ====================== ETAPAS ======================
+function addStage(e){
+  e.preventDefault();
+  const name=document.getElementById('sN').value.trim();
+  const date=document.getElementById('sD').value;
+  G.data.stages.push({id:uid(),name,date,kartDraw:{'Dinos':[],'Baby Dinos':[]},qualifying:{'Dinos':[],'Baby Dinos':[]},battery1:{'Dinos':[],'Baby Dinos':[]},battery2:{'Dinos':[],'Baby Dinos':[]}});
+  save();render();
+}
+function delStage(id){if(!confirm('Excluir etapa?'))return;G.data.stages=G.data.stages.filter(s=>s.id!==id);save();render();}
+function openEdit(id){G.editStageId=id;G.editTab='draw';G.editCat='Dinos';G.page='edit';render();}
+function setTab(t){G.editTab=t;render()}
+function setCat(c){G.editCat=c;render()}
 
-        function goto(p) { 
-            app.page = p; 
-            app.editingStage = null;
-            render(); 
-        }
+// ====================== SORTEIO (arquivado) ======================
+function doDraw(e){
+  e.preventDefault();
+  const cat=G.editCat;
+  const stage=G.data.stages.find(s=>s.id===G.editStageId);
+  if(!stage)return;
+  const pilots=G.data.pilots.filter(p=>p.cat===cat);
+  if(!pilots.length)return alert('Nenhum piloto nesta categoria!');
+  const karts=[...G.data.karts].sort(()=>Math.random()-.5);
+  if(karts.length<pilots.length)return alert('Karts insuficientes!');
+  if(stage.kartDraw[cat]&&stage.kartDraw[cat].length>0){if(!confirm('Ja existe sorteio para '+cat+'. Refazer?'))return;}
+  stage.kartDraw[cat]=pilots.map((p,i)=>({pilotId:p.id,pilotName:p.name,pilotNumber:p.number,kartNum:karts[i].num}));
+  save();alert('Sorteio arquivado!');render();
+}
 
-        // ===== PILOTOS =====
-        function addPilot(e) {
-            e.preventDefault();
-            const name = document.getElementById('pname').value;
-            const num = document.getElementById('pnum').value;
-            const cat = document.getElementById('pcat').value;
-            app.data.pilots.push({ 
-                id: generateId(), 
-                name, 
-                number: num || null,
-                cat 
+// ====================== QUALIFYING ======================
+function saveQ(e){
+  e.preventDefault();
+  const stage=G.data.stages.find(s=>s.id===G.editStageId);
+  if(!stage)return;
+  const cat=G.editCat;
+  const results=[];
+  G.data.pilots.filter(p=>p.cat===cat).forEach(pilot=>{
+    const el=document.getElementById('qt_'+pilot.id);
+    const t=el?el.value.trim():'';
+    if(t)results.push({pilotId:pilot.id,pilotName:pilot.name,pilotNumber:pilot.number,time:t,position:0,points:0});
+  });
+  results.sort((a,b)=>a.time.localeCompare(b.time));
+  results.forEach((r,i)=>{r.position=i+1;r.points=G.data.points.qualifying[i]||0;});
+  stage.qualifying[cat]=results;save();alert('Qualifying salvo!');render();
+}
+
+// ====================== BATERIA ======================
+function saveB(e,bn){
+  e.preventDefault();
+  const stage=G.data.stages.find(s=>s.id===G.editStageId);
+  if(!stage)return;
+  const cat=G.editCat;
+  const results=[];
+  G.data.pilots.filter(p=>p.cat===cat).forEach(pilot=>{
+    const pos=parseInt((document.getElementById('bp'+bn+'_'+pilot.id)||{}).value)||0;
+    const pen=parseInt((document.getElementById('bn'+bn+'_'+pilot.id)||{}).value)||0;
+    const vl=(document.getElementById('bv'+bn+'_'+pilot.id)||{}).value||'';
+    const dcl=(document.getElementById('bd'+bn+'_'+pilot.id)||{}).checked||false;
+    const dnp=(document.getElementById('bx'+bn+'_'+pilot.id)||{}).checked||false;
+    let pts=0;if(!dcl&&!dnp&&pos>0)pts=G.data.points.battery[pos-1]||0;
+    results.push({pilotId:pilot.id,pilotName:pilot.name,pilotNumber:pilot.number,position:pos,points:pts,penalties:pen,bestLap:vl.trim(),disqualified:dcl,didNotParticipate:dnp});
+  });
+  stage['battery'+bn][cat]=results;save();alert(bn+'a Bateria salva!');render();
+}
+
+// ====================== CALCULO ======================
+function calcSt(cat){
+  return G.data.pilots.filter(p=>p.cat===cat).map(pilot=>{
+    let total=0;const rows=[];
+    G.data.stages.forEach(stage=>{
+      let sp=0,bonus=0,pen=0;
+      const q=(stage.qualifying[cat]||[]).find(x=>x.pilotId===pilot.id);
+      if(q){sp+=q.points||0;if((stage.qualifying[cat]||[])[0]?.pilotId===pilot.id)bonus+=G.data.points.bestQualifyBonus;}
+      ['battery1','battery2'].forEach(bk=>{const b=(stage[bk][cat]||[]).find(x=>x.pilotId===pilot.id);if(b&&!b.disqualified&&!b.didNotParticipate){sp+=b.points||0;pen+=b.penalties||0;}});
+      const allB=[...(stage.battery1[cat]||[]),...(stage.battery2[cat]||[])].filter(b=>b.bestLap&&!b.disqualified&&!b.didNotParticipate);
+      if(allB.length){allB.sort((a,b)=>a.bestLap.localeCompare(b.bestLap));if(allB[0].pilotId===pilot.id)bonus+=G.data.points.bestLapBonus;}
+      const fp=sp+bonus-pen;total+=fp;
+      rows.push({stageName:stage.name,points:fp,bonus,pen});
+    });
+    return {pilotId:pilot.id,pilotName:pilot.name,pilotNumber:pilot.number,total,rows};
+  }).sort((a,b)=>b.total-a.total);
+}
+
+function toggleAcc(id){const el=document.getElementById(id);if(el)el.classList.toggle('open');}
+
+// ====================== LOGIN RENDER ======================
+function renderLogin(){
+  return `<div class="login-wrap"><div class="login-box">
+    <div class="login-logo"><span class="ico">🏎️</span><h1>${G.data.name}</h1><p>Sistema de Gerenciamento</p></div>
+    <div id="lerr" class="err"></div>
+    <form onsubmit="doLogin(event)">
+      <div class="lfield"><label>Usuário</label><input type="text" id="lU" placeholder="Digite seu usuário" required autocomplete="username"></div>
+      <div class="lfield"><label>Senha</label><input type="password" id="lP" placeholder="Digite sua senha" required autocomplete="current-password"></div>
+      <button type="submit" class="btn-login">Entrar →</button>
+    </form>
+    <div class="login-creds">
+      <div class="cred-row ca"><div class="cred-ico">👑</div><div class="cred-info"><strong>Administrador</strong><span>usuário: admin | senha: admin123</span></div></div>
+      <div class="cred-row cp"><div class="cred-ico">🪖</div><div class="cred-info"><strong>Pilotos (todos)</strong><span>usuário: piloto | senha: piloto123</span></div></div>
+    </div>
+  </div></div>`;
+}
+
+// ====================== HEADER ======================
+function renderHeader(){
+  const isA=G.user&&G.user.role==='admin';
+  return `<div class="hdr"><div><h2>🏎️ ${G.data.name}</h2><p><span class="rb ${isA?'rb-a':'rb-p'}">${isA?'Admin':'Piloto'}</span>${G.user.name}</p></div><button class="btn-out" onclick="logout()">Sair ↩</button></div>`;
+}
+
+// ====================== NAV ======================
+function renderNav(){
+  const isA=G.user&&G.user.role==='admin';
+  const p=G.page;
+  return `<div class="nav">
+    <span class="nlbl">Visualização</span>
+    <button class="nb ${p==='standings'?'active':''}" onclick="goto('standings')">🏆<br>Ranking<br>Geral</button>
+    <button class="nb ${p==='stage-view'?'active':''}" onclick="goto('stage-view')">📋<br>Ranking<br>Etapas</button>
+    <button class="nb ${p==='bestlaps'?'active':''}" onclick="goto('bestlaps')">⚡<br>Melhores<br>Voltas</button>
+    <button class="nb ${p==='presence'?'active':''}" onclick="goto('presence')">👥<br>Presença</button>
+    <button class="nb ${p==='pilot-list'?'active':''}" onclick="goto('pilot-list')">🪖<br>Pilotos</button>
+    ${isA?`<div class="nsep"></div><span class="nlbl">Administração</span>
+    <button class="nb ${p==='home'?'active':''}" onclick="goto('home')">🏠<br>Painel</button>
+    <button class="nb ${p==='adm-p'?'active':''}" onclick="goto('adm-p')">👤<br>Pilotos</button>
+    <button class="nb ${p==='adm-k'?'active':''}" onclick="goto('adm-k')">🎲<br>Karts</button>
+    <button class="nb ${p==='adm-s'?'active':''}" onclick="goto('adm-s')">📅<br>Etapas</button>
+    <button class="nb ${p==='cfg'?'active':''}" onclick="goto('cfg')">⚙️<br>Config.</button>`:''}
+  </div>`;
+}
+
+// ====================== RANKING GERAL ======================
+function renderStandings(){
+  const cat=G.standCat;const st=calcSt(cat);
+  let pod='';
+  if(st.length>=1){
+    pod='<div class="podium">';
+    if(st[1])pod+=`<div class="pp pp2"><div class="pm">🥈</div><div class="pp-pos">2°</div><div class="ppn">${st[1].pilotName}</div><div class="ppp">${st[1].total} pts</div></div>`;
+    if(st[0])pod+=`<div class="pp pp1"><div class="pm">🥇</div><div class="pp-pos">1°</div><div class="ppn">${st[0].pilotName}</div><div class="ppp">${st[0].total} pts</div></div>`;
+    if(st[2])pod+=`<div class="pp pp3"><div class="pm">🥉</div><div class="pp-pos">3°</div><div class="ppn">${st[2].pilotName}</div><div class="ppp">${st[2].total} pts</div></div>`;
+    pod+='</div>';
+  }
+  let tbl=`<div class="tw"><table><thead><tr><th>Pos</th><th>Piloto</th><th>Total</th>`;
+  G.data.stages.forEach(s=>{tbl+=`<th>${s.name}</th>`;});
+  tbl+=`</tr></thead><tbody>`;
+  if(!st.length)tbl+=`<tr><td colspan="20" style="text-align:center;color:#aaa;padding:30px;">Nenhum dado ainda.</td></tr>`;
+  st.forEach((s,i)=>{
+    const bg=i===0?'#fffbeb':i===1?'#f9fafb':i===2?'#fff8f4':'white';
+    const pc=i<3?['p1','p2','p3'][i]:'';
+    tbl+=`<tr style="background:${bg}"><td><div class="pb ${pc}">${i+1}</div></td>`;
+    tbl+=`<td><strong>${s.pilotName}</strong>${s.pilotNumber?`<br><small style="color:#aaa;">#${s.pilotNumber}</small>`:''}</td>`;
+    tbl+=`<td><span class="ptb">${s.total}</span></td>`;
+    s.rows.forEach(r=>{
+      tbl+=`<td><div style="font-weight:800;">${r.points}</div>`;
+      if(r.bonus>0)tbl+=`<div style="font-size:11px;color:#10b981;">+${r.bonus}</div>`;
+      if(r.pen>0)tbl+=`<div style="font-size:11px;color:#dc2626;">-${r.pen}</div>`;
+      tbl+=`</td>`;
+    });
+    tbl+=`</tr>`;
+  });
+  tbl+=`</tbody></table></div>`;
+  return `<div class="card"><div class="ct">🏆 Ranking Geral</div>
+    <div class="tabs">
+      <button class="tab ${cat==='Dinos'?'active':''}" onclick="G.standCat='Dinos';render()">🦕 Dinos — Senior</button>
+      <button class="tab ${cat==='Baby Dinos'?'active':''}" onclick="G.standCat='Baby Dinos';render()">🐣 Baby Dinos — Graduados</button>
+    </div>${pod}${tbl}</div>`;
+}
+
+// ====================== RANKING ETAPAS ======================
+function renderStageView(){
+  const cat=G.viewCat;let cards='';
+  if(!G.data.stages.length){cards='<p style="text-align:center;color:#aaa;padding:30px;">Nenhuma etapa ainda.</p>';}
+  else{
+    G.data.stages.forEach(stage=>{
+      const isO=G.openStageId===stage.id;
+      const ds=stage.date?new Date(stage.date+'T00:00:00').toLocaleDateString('pt-BR'):'';
+      const draw=(stage.kartDraw&&stage.kartDraw[cat])||[];
+      const q=stage.qualifying[cat]||[];
+      let body='';
+      if(isO){
+        body+=`<div class="sectit">🎲 Karts Sorteados</div>`;
+        if(draw.length){draw.forEach((r,i)=>{body+=`<div class="krow"><div style="display:flex;align-items:center;gap:10px;">${r.pilotNumber?`<div class="pnum">${r.pilotNumber}</div>`:''}<strong>${i+1}. ${r.pilotName}</strong></div><span class="ktag">Kart ${r.kartNum}</span></div>`;});}
+        else body+=`<p style="color:#aaa;font-size:13px;font-style:italic;">Sorteio nao realizado.</p>`;
+        body+=`<div class="sectit">⏱ Qualifying</div>`;
+        if(q.length){
+          body+=`<div class="tw"><table><thead><tr><th>Pos</th><th>Piloto</th><th>Tempo</th><th>Pts</th></tr></thead><tbody>`;
+          q.forEach((r,i)=>{const pc=i<3?['p1','p2','p3'][i]:'';body+=`<tr><td><div class="pb ${pc}">${i+1}</div></td><td><strong>${r.pilotName}</strong></td><td style="font-family:monospace;font-weight:700;color:#3b82f6;">${r.time}</td><td style="font-weight:800;">${r.points}</td></tr>`;});
+          body+=`</tbody></table></div>`;
+        }else body+=`<p style="color:#aaa;font-size:13px;font-style:italic;">Sem dados.</p>`;
+        ['battery1','battery2'].forEach((bk,bi)=>{
+          const bArr=stage[bk][cat]||[];
+          body+=`<div class="sectit">🏁 ${bi+1}ª Bateria</div>`;
+          if(bArr.length){
+            const sorted=[...bArr].sort((a,b)=>{if(a.disqualified||a.didNotParticipate)return 1;if(b.disqualified||b.didNotParticipate)return -1;return a.position-b.position;});
+            body+=`<div class="tw"><table><thead><tr><th>Pos</th><th>Piloto</th><th>Melhor Volta</th><th>Pts</th><th>Status</th></tr></thead><tbody>`;
+            sorted.forEach(r=>{
+              let sl='',sc='';
+              if(r.disqualified){sl='DCLAS.';sc='color:#dc2626;font-weight:800;';}
+              else if(r.didNotParticipate){sl='Nao Part.';sc='color:#aaa;';}
+              else if(r.penalties>0){sl='-'+r.penalties+' pts';sc='color:#f59e0b;font-weight:700;';}
+              const sp=r.disqualified||r.didNotParticipate?'—':r.position+'°';
+              const pp=r.disqualified||r.didNotParticipate?'0':r.points;
+              const pc=(!r.disqualified&&!r.didNotParticipate&&r.position>0&&r.position<4)?['p1','p2','p3'][r.position-1]:'';
+              body+=`<tr><td><div class="pb ${pc}">${sp}</div></td><td><strong>${r.pilotName}</strong></td><td style="font-family:monospace;font-weight:700;color:#10b981;">${r.bestLap||'—'}</td><td style="font-weight:800;">${pp}</td><td style="${sc}">${sl}</td></tr>`;
             });
-            save();
-            render();
-        }
-
-        function delPilot(id) {
-            if (confirm('Excluir piloto?')) {
-                app.data.pilots = app.data.pilots.filter(p => p.id != id);
-                save();
-                render();
-            }
-        }
-
-        // ===== KARTS =====
-        function addKart(e) {
-            e.preventDefault();
-            const num = document.getElementById('knum').value;
-            app.data.karts.push({ id: generateId(), num });
-            save();
-            render();
-        }
-
-        function delKart(id) {
-            app.data.karts = app.data.karts.filter(k => k.id != id);
-            save();
-            render();
-        }
-
-        function draw() {
-            const cat = document.getElementById('dcat').value;
-            const pilots = app.data.pilots.filter(p => p.cat === cat);
-            const karts = [...app.data.karts].sort(() => Math.random() - 0.5);
-            
-            if (pilots.length === 0) return alert('Sem pilotos nesta categoria!');
-            if (karts.length < pilots.length) return alert('Sem karts suficientes!');
-
-            let html = '<div class="card"><h3>Resultado - ' + cat + '</h3>';
-            pilots.forEach((p, i) => {
-                html += '<div class="item"><strong>' + (i+1) + '. ' + p.name + '</strong><span style="background:#dc2626;color:white;padding:5px 15px;border-radius:20px;">Kart ' + karts[i].num + '</span></div>';
-            });
-            html += '</div>';
-            document.getElementById('dresult').innerHTML = html;
-        }
-
-        // ===== ETAPAS =====
-        function createStage(e) {
-            e.preventDefault();
-            const stage = {
-                id: generateId(),
-                name: document.getElementById('sname').value,
-                date: document.getElementById('sdate').value,
-                qualifying: {},
-                battery1: {},
-                battery2: {}
-            };
-            
-            // Inicializar categorias
-            ['Dinos', 'Baby Dinos'].forEach(cat => {
-                stage.qualifying[cat] = [];
-                stage.battery1[cat] = [];
-                stage.battery2[cat] = [];
-            });
-
-            app.data.stages.push(stage);
-            save();
-            render();
-        }
-
-        function delStage(id) {
-            if (confirm('Excluir etapa?')) {
-                app.data.stages = app.data.stages.filter(s => s.id != id);
-                save();
-                render();
-            }
-        }
-
-        function editStage(id) {
-            app.editingStage = id;
-            app.page = 'edit-stage';
-            render();
-        }
-
-        function saveQualifying(e) {
-            e.preventDefault();
-            const stageId = app.editingStage;
-            const stage = app.data.stages.find(s => s.id === stageId);
-            if (!stage) return;
-
-            const cat = document.getElementById('qcat').value;
-            const results = [];
-
-            app.data.pilots.filter(p => p.cat === cat).forEach(pilot => {
-                const time = document.getElementById('qtime-' + pilot.id).value;
-                if (time && time.trim()) {
-                    results.push({
-                        pilotId: pilot.id,
-                        pilotName: pilot.name,
-                        time: time,
-                        points: 0,
-                        position: 0
-                    });
-                }
-            });
-
-            // Ordenar por tempo e atribuir posições
-            results.sort((a, b) => {
-                const timeA = parseFloat(a.time.replace(':', '').replace(',', '.'));
-                const timeB = parseFloat(b.time.replace(':', '').replace(',', '.'));
-                return timeA - timeB;
-            });
-
-            results.forEach((r, i) => {
-                r.position = i + 1;
-                r.points = app.data.points.qualifying[i] || 0;
-            });
-
-            stage.qualifying[cat] = results;
-            save();
-            alert('Qualifying salvo!');
-            render();
-        }
-
-        function saveBattery(e, batteryNum) {
-            e.preventDefault();
-            const stageId = app.editingStage;
-            const stage = app.data.stages.find(s => s.id === stageId);
-            if (!stage) return;
-
-            const cat = document.getElementById('bcat' + batteryNum).value;
-            const batteryKey = 'battery' + batteryNum;
-            const results = [];
-
-            app.data.pilots.filter(p => p.cat === cat).forEach(pilot => {
-                const pos = document.getElementById('bpos' + batteryNum + '-' + pilot.id).value;
-                const pen = document.getElementById('bpen' + batteryNum + '-' + pilot.id).value;
-                const dcl = document.getElementById('bdcl' + batteryNum + '-' + pilot.id).checked;
-                const dnp = document.getElementById('bdnp' + batteryNum + '-' + pilot.id).checked;
-
-                if (pos || dcl || dnp) {
-                    const position = parseInt(pos) || 0;
-                    const penalties = parseInt(pen) || 0;
-                    let points = 0;
-
-                    if (!dcl && !dnp && position > 0) {
-                        points = app.data.points.battery[position - 1] || 0;
-                    }
-
-                    results.push({
-                        pilotId: pilot.id,
-                        pilotName: pilot.name,
-                        position: position,
-                        points: points,
-                        penalties: penalties,
-                        disqualified: dcl,
-                        didNotParticipate: dnp
-                    });
-                }
-            });
-
-            stage[batteryKey][cat] = results;
-            save();
-            alert('Bateria ' + batteryNum + ' salva!');
-            render();
-        }
-
-        // ===== CÁLCULO DE CLASSIFICAÇÃO =====
-        function calculateStandings(category) {
-            const pilots = app.data.pilots.filter(p => p.cat === category);
-            
-            return pilots.map(pilot => {
-                let totalPoints = 0;
-                const stageResults = [];
-
-                app.data.stages.forEach(stage => {
-                    let stagePoints = 0;
-                    let bonusPoints = 0;
-                    let penalties = 0;
-
-                    // Qualifying
-                    const qResult = (stage.qualifying[category] || []).find(q => q.pilotId === pilot.id);
-                    if (qResult) {
-                        stagePoints += qResult.points || 0;
-                        
-                        // Bônus melhor tempo qualifying
-                        const allQ = stage.qualifying[category] || [];
-                        if (allQ.length > 0 && allQ[0].pilotId === pilot.id) {
-                            bonusPoints += app.data.points.bestQualifyBonus;
-                        }
-                    }
-
-                    // Bateria 1
-                    const b1Result = (stage.battery1[category] || []).find(b => b.pilotId === pilot.id);
-                    if (b1Result) {
-                        if (!b1Result.disqualified && !b1Result.didNotParticipate) {
-                            stagePoints += b1Result.points || 0;
-                            penalties += b1Result.penalties || 0;
-                        }
-                    }
-
-                    // Bateria 2
-                    const b2Result = (stage.battery2[category] || []).find(b => b.pilotId === pilot.id);
-                    if (b2Result) {
-                        if (!b2Result.disqualified && !b2Result.didNotParticipate) {
-                            stagePoints += b2Result.points || 0;
-                            penalties += b2Result.penalties || 0;
-                        }
-                    }
-
-                    const finalPoints = stagePoints + bonusPoints - penalties;
-                    totalPoints += finalPoints;
-
-                    stageResults.push({
-                        stageName: stage.name,
-                        points: finalPoints,
-                        rawPoints: stagePoints,
-                        bonusPoints: bonusPoints,
-                        penalties: penalties
-                    });
-                });
-
-                return {
-                    pilotId: pilot.id,
-                    pilotName: pilot.name,
-                    pilotNumber: pilot.number,
-                    category: pilot.cat,
-                    totalPoints: totalPoints,
-                    stageResults: stageResults
-                };
-            }).sort((a, b) => b.totalPoints - a.totalPoints);
-        }
-
-        function showStandings(cat) {
-            const standings = calculateStandings(cat);
-            
-            let html = '';
-
-            // Pódio
-            if (standings.length >= 3) {
-                html += '<div class="podium">';
-                
-                // 2º lugar
-                if (standings[1]) {
-                    html += `<div class="podium-item">
-                        <div style="font-size:48px;">🥈</div>
-                        <div style="font-size:24px;font-weight:bold;">2º</div>
-                        <div style="font-weight:600;margin:10px 0;">${standings[1].pilotName}</div>
-                        <div style="font-size:20px;color:#666;">${standings[1].totalPoints} pts</div>
-                    </div>`;
-                }
-                
-                // 1º lugar
-                if (standings[0]) {
-                    html += `<div class="podium-item" style="transform:scale(1.1);">
-                        <div style="font-size:64px;">🥇</div>
-                        <div style="font-size:32px;font-weight:bold;color:#dc2626;">1º</div>
-                        <div style="font-weight:bold;font-size:18px;margin:10px 0;">${standings[0].pilotName}</div>
-                        <div style="font-size:24px;color:#dc2626;font-weight:bold;">${standings[0].totalPoints} pts</div>
-                    </div>`;
-                }
-                
-                // 3º lugar
-                if (standings[2]) {
-                    html += `<div class="podium-item">
-                        <div style="font-size:40px;">🥉</div>
-                        <div style="font-size:20px;font-weight:bold;">3º</div>
-                        <div style="font-weight:600;margin:10px 0;">${standings[2].pilotName}</div>
-                        <div style="font-size:18px;color:#666;">${standings[2].totalPoints} pts</div>
-                    </div>`;
-                }
-                
-                html += '</div>';
-            }
-
-            // Tabela
-            html += '<div style="overflow-x:auto;"><table><thead><tr>';
-            html += '<th>Pos</th><th>Piloto</th><th>Total</th>';
-            app.data.stages.forEach(s => {
-                html += '<th>' + s.name + '</th>';
-            });
-            html += '</tr></thead><tbody>';
-
-            standings.forEach((s, i) => {
-                html += '<tr>';
-                html += '<td style="font-weight:bold;font-size:18px;">' + (i+1) + 'º</td>';
-                html += '<td style="font-weight:600;">' + s.pilotName + (s.pilotNumber ? ' #' + s.pilotNumber : '') + '</td>';
-                html += '<td style="font-weight:bold;color:#dc2626;font-size:18px;">' + s.totalPoints + '</td>';
-                
-                s.stageResults.forEach(sr => {
-                    html += '<td>';
-                    html += '<div style="font-weight:600;">' + sr.points + '</div>';
-                    if (sr.bonusPoints > 0) {
-                        html += '<div style="font-size:11px;color:green;">+' + sr.bonusPoints + '</div>';
-                    }
-                    if (sr.penalties > 0) {
-                        html += '<div style="font-size:11px;color:red;">-' + sr.penalties + '</div>';
-                    }
-                    html += '</td>';
-                });
-                
-                html += '</tr>';
-            });
-
-            html += '</tbody></table></div>';
-
-            document.getElementById('sresult').innerHTML = html;
-        }
-
-        // ===== PÁGINAS =====
-        function pageLogin() {
-            return `<div class="login-container">
-                <div class="login-card">
-                    <div class="logo">🏎️</div>
-                    <h1 style="text-align:center;margin-bottom:10px;">Campeonato de Kart</h1>
-                    <p style="text-align:center;color:#666;margin-bottom:30px;">Sistema de Gerenciamento</p>
-                    <form onsubmit="login(event)">
-                        <input type="text" id="user" placeholder="Usuário" required>
-                        <input type="password" id="pass" placeholder="Senha" required>
-                        <button type="submit" class="btn">Entrar</button>
-                    </form>
-                    <div style="margin-top:20px;padding:15px;background:#f9fafb;border-radius:8px;">
-                        <p style="text-align:center;color:#666;font-size:14px;">
-                            <strong>Login Admin:</strong><br>
-                            Usuário: <strong>admin</strong><br>
-                            Senha: <strong>admin123</strong>
-                        </p>
-                    </div>
-                </div>
-            </div>`;
-        }
-
-        function pageHome() {
-            return `<div class="card">
-                <h1>🏎️ ${app.data.name}</h1>
-                <div class="stat-grid">
-                    <div class="stat-card">
-                        <div class="stat-number">${app.data.pilots.length}</div>
-                        <div class="stat-label">Pilotos</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">${app.data.stages.length}</div>
-                        <div class="stat-label">Etapas</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">${app.data.karts.length}</div>
-                        <div class="stat-label">Karts</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">2</div>
-                        <div class="stat-label">Categorias</div>
-                    </div>
-                </div>
-            </div>`;
-        }
-
-        function pagePilots() {
-            const dinos = app.data.pilots.filter(p => p.cat === 'Dinos');
-            const baby = app.data.pilots.filter(p => p.cat === 'Baby Dinos');
-            
-            return `<div class="card">
-                <h2>👥 Gerenciar Pilotos</h2>
-                <form onsubmit="addPilot(event)">
-                    <div class="form-group">
-                        <label>Nome do Piloto</label>
-                        <input type="text" id="pname" placeholder="Nome completo" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Número (opcional)</label>
-                        <input type="text" id="pnum" placeholder="Ex: 77">
-                    </div>
-                    <div class="form-group">
-                        <label>Categoria</label>
-                        <select id="pcat" required>
-                            <option value="Dinos">Dinos (Senior)</option>
-                            <option value="Baby Dinos">Baby Dinos (Graduados)</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="btn btn-success">➕ Adicionar Piloto</button>
-                </form>
-
-                <h3 style="margin-top:30px;">Dinos - Senior (${dinos.length})</h3>
-                ${dinos.length === 0 ? '<p style="color:#666;">Nenhum piloto cadastrado</p>' : ''}
-                ${dinos.map(p => `
-                    <div class="item">
-                        <div>
-                            <strong>${p.name}</strong>
-                            ${p.number ? '<span style="color:#666;"> - #' + p.number + '</span>' : ''}
-                        </div>
-                        <button class="del-btn" onclick="delPilot('${p.id}')">Excluir</button>
-                    </div>
-                `).join('')}
-
-                <h3 style="margin-top:30px;">Baby Dinos - Graduados (${baby.length})</h3>
-                ${baby.length === 0 ? '<p style="color:#666;">Nenhum piloto cadastrado</p>' : ''}
-                ${baby.map(p => `
-                    <div class="item">
-                        <div>
-                            <strong>${p.name}</strong>
-                            ${p.number ? '<span style="color:#666;"> - #' + p.number + '</span>' : ''}
-                        </div>
-                        <button class="del-btn" onclick="delPilot('${p.id}')">Excluir</button>
-                    </div>
-                `).join('')}
-            </div>`;
-        }
-
-        function pageKarts() {
-            return `<div class="card">
-                <h2>🎲 Sorteio de Karts</h2>
-                
-                <h3>Cadastrar Karts</h3>
-                <form onsubmit="addKart(event)">
-                    <input type="text" id="knum" placeholder="Número do Kart" required>
-                    <button type="submit" class="btn btn-success">➕ Adicionar Kart</button>
-                </form>
-
-                <h3 style="margin-top:20px;">Karts Cadastrados (${app.data.karts.length})</h3>
-                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px;margin-bottom:20px;">
-                    ${app.data.karts.map(k => `
-                        <div style="background:#f3f4f6;padding:10px;border-radius:8px;text-align:center;position:relative;">
-                            <strong>Kart ${k.num}</strong>
-                            <button onclick="delKart('${k.id}')" style="position:absolute;top:5px;right:5px;background:#ef4444;color:white;border:none;border-radius:4px;padding:2px 8px;cursor:pointer;font-size:14px;">×</button>
-                        </div>
-                    `).join('')}
-                </div>
-
-                <h3>Realizar Sorteio</h3>
-                <select id="dcat">
-                    <option value="Dinos">Dinos (Senior)</option>
-                    <option value="Baby Dinos">Baby Dinos (Graduados)</option>
-                </select>
-                <button class="btn" onclick="draw()">🎲 Sortear Karts</button>
-                <div id="dresult"></div>
-            </div>`;
-        }
-
-        function pageStages() {
-            return `<div class="card">
-                <h2>📅 Etapas do Campeonato</h2>
-                
-                <form onsubmit="createStage(event)">
-                    <div class="form-group">
-                        <label>Nome da Etapa</label>
-                        <input type="text" id="sname" placeholder="Ex: 1ª Etapa" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Data</label>
-                        <input type="date" id="sdate" required>
-                    </div>
-                    <button type="submit" class="btn btn-success">➕ Criar Etapa</button>
-                </form>
-
-                <h3 style="margin-top:30px;">Etapas Cadastradas (${app.data.stages.length})</h3>
-                ${app.data.stages.length === 0 ? '<p style="color:#666;">Nenhuma etapa cadastrada</p>' : ''}
-                ${app.data.stages.map(s => `
-                    <div class="item">
-                        <div>
-                            <strong>${s.name}</strong>
-                            <span style="color:#666;"> - ${new Date(s.date + 'T00:00:00').toLocaleDateString('pt-BR')}</span>
-                        </div>
-                        <div style="display:flex;gap:10px;">
-                            <button class="btn-secondary btn-small" onclick="editStage('${s.id}')">✏️ Editar</button>
-                            <button class="del-btn" onclick="delStage('${s.id}')">Excluir</button>
-                        </div>
-                    </div>
-                `).join('')}
-            </div>`;
-        }
-
-        function pageEditStage() {
-            const stage = app.data.stages.find(s => s.id === app.editingStage);
-            if (!stage) {
-                app.page = 'stages';
-                render();
-                return '';
-            }
-
-            return `<div class="card">
-                <h2>✏️ Editar: ${stage.name}</h2>
-                <p style="color:#666;margin-bottom:20px;">${new Date(stage.date + 'T00:00:00').toLocaleDateString('pt-BR')}</p>
-
-                <div class="tabs">
-                    <button class="tab active" onclick="showTab('qualifying')">Qualifying</button>
-                    <button class="tab" onclick="showTab('battery1')">1ª Bateria</button>
-                    <button class="tab" onclick="showTab('battery2')">2ª Bateria</button>
-                </div>
-
-                <!-- Qualifying -->
-                <div id="tab-qualifying">
-                    <h3>Qualifying (2 voltas)</h3>
-                    <form onsubmit="saveQualifying(event)">
-                        <div class="form-group">
-                            <label>Categoria</label>
-                            <select id="qcat">
-                                <option value="Dinos">Dinos (Senior)</option>
-                                <option value="Baby Dinos">Baby Dinos (Graduados)</option>
-                            </select>
-                        </div>
-                        <p style="font-size:14px;color:#666;margin-bottom:15px;">
-                            Digite o melhor tempo de cada piloto no formato MM:SS.mmm (ex: 1:23.456) ou SS.mmm (ex: 58.123)
-                        </p>
-                        ${renderQualifyingForm()}
-                        <button type="submit" class="btn btn-success">💾 Salvar Qualifying</button>
-                    </form>
-                </div>
-
-                <!-- Bateria 1 -->
-                <div id="tab-battery1" class="hidden">
-                    <h3>1ª Bateria (10 minutos)</h3>
-                    <form onsubmit="saveBattery(event, 1)">
-                        <div class="form-group">
-                            <label>Categoria</label>
-                            <select id="bcat1">
-                                <option value="Dinos">Dinos (Senior)</option>
-                                <option value="Baby Dinos">Baby Dinos (Graduados)</option>
-                            </select>
-                        </div>
-                        ${renderBatteryForm(1)}
-                        <button type="submit" class="btn btn-success">💾 Salvar 1ª Bateria</button>
-                    </form>
-                </div>
-
-                <!-- Bateria 2 -->
-                <div id="tab-battery2" class="hidden">
-                    <h3>2ª Bateria (10 minutos)</h3>
-                    <form onsubmit="saveBattery(event, 2)">
-                        <div class="form-group">
-                            <label>Categoria</label>
-                            <select id="bcat2">
-                                <option value="Dinos">Dinos (Senior)</option>
-                                <option value="Baby Dinos">Baby Dinos (Graduados)</option>
-                            </select>
-                        </div>
-                        ${renderBatteryForm(2)}
-                        <button type="submit" class="btn btn-success">💾 Salvar 2ª Bateria</button>
-                    </form>
-                </div>
-
-                <button class="btn btn-secondary" onclick="goto('stages')" style="margin-top:20px;">← Voltar para Etapas</button>
-            </div>`;
-        }
-
-        function renderQualifyingForm() {
-            let html = '';
-            const dinosPilots = app.data.pilots.filter(p => p.cat === 'Dinos');
-            const babyPilots = app.data.pilots.filter(p => p.cat === 'Baby Dinos');
-
-            ['Dinos', 'Baby Dinos'].forEach(cat => {
-                const pilots = cat === 'Dinos' ? dinosPilots : babyPilots;
-                
-                pilots.forEach(pilot => {
-                    html += `<div class="form-group">
-                        <label>${pilot.name} ${pilot.number ? '#' + pilot.number : ''}</label>
-                        <input type="text" id="qtime-${pilot.id}" placeholder="Ex: 1:23.456 ou 58.123">
-                    </div>`;
-                });
-            });
-
-            return html;
-        }
-
-        function renderBatteryForm(batteryNum) {
-            let html = '';
-            const dinosPilots = app.data.pilots.filter(p => p.cat === 'Dinos');
-            const babyPilots = app.data.pilots.filter(p => p.cat === 'Baby Dinos');
-
-            ['Dinos', 'Baby Dinos'].forEach(cat => {
-                const pilots = cat === 'Dinos' ? dinosPilots : babyPilots;
-                
-                pilots.forEach(pilot => {
-                    html += `<div style="background:#f9fafb;padding:15px;border-radius:8px;margin-bottom:10px;">
-                        <strong style="display:block;margin-bottom:10px;">${pilot.name} ${pilot.number ? '#' + pilot.number : ''}</strong>
-                        <div class="grid-2">
-                            <div class="form-group" style="margin-bottom:0;">
-                                <label style="font-size:13px;">Posição</label>
-                                <input type="number" id="bpos${batteryNum}-${pilot.id}" min="1" placeholder="1º, 2º, 3º...">
-                            </div>
-                            <div class="form-group" style="margin-bottom:0;">
-                                <label style="font-size:13px;">Penalidades</label>
-                                <input type="number" id="bpen${batteryNum}-${pilot.id}" min="0" value="0">
-                            </div>
-                        </div>
-                        <div style="display:flex;gap:15px;margin-top:10px;">
-                            <div class="checkbox-group">
-                                <input type="checkbox" id="bdcl${batteryNum}-${pilot.id}">
-                                <label style="margin:0;font-weight:normal;font-size:14px;">Desclassificado</label>
-                            </div>
-                            <div class="checkbox-group">
-                                <input type="checkbox" id="bdnp${batteryNum}-${pilot.id}">
-                                <label style="margin:0;font-weight:normal;font-size:14px;">Não Participou</label>
-                            </div>
-                        </div>
-                    </div>`;
-                });
-            });
-
-            return html;
-        }
-
-        function pageStandings() {
-            return `<div class="card">
-                <h2>🏆 Classificação Geral</h2>
-                
-                <div class="tabs">
-                    <button class="tab active" onclick="showStandings('Dinos')">Dinos (Senior)</button>
-                    <button class="tab" onclick="showStandings('Baby Dinos')">Baby Dinos (Graduados)</button>
-                </div>
-
-                <div id="sresult" style="margin-top:20px;"></div>
-            </div>`;
-        }
-
-        function showTab(tabName) {
-            ['qualifying', 'battery1', 'battery2'].forEach(t => {
-                document.getElementById('tab-' + t).classList.add('hidden');
-            });
-            document.getElementById('tab-' + tabName).classList.remove('hidden');
-            
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
-        }
-
-        // ===== RENDER PRINCIPAL =====
-        function render() {
-            const el = document.getElementById('app');
-            if (!el) return;
-
-            if (!app.user) {
-                el.innerHTML = pageLogin();
-                return;
-            }
-
-            let content = '';
-            switch(app.page) {
-                case 'home': content = pageHome(); break;
-                case 'pilots': content = pagePilots(); break;
-                case 'karts': content = pageKarts(); break;
-                case 'stages': content = pageStages(); break;
-                case 'edit-stage': content = pageEditStage(); break;
-                case 'standings': content = pageStandings(); break;
-                default: content = pageHome();
-            }
-
-            el.innerHTML = `<div class="container">
-                <div class="card">
-                    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
-                        <div>
-                            <h2 style="margin:0;">🏎️ ${app.data.name}</h2>
-                            <p style="margin:5px 0 0 0;color:#666;font-size:14px;">Admin: ${app.user.name}</p>
-                        </div>
-                        <button class="btn del-btn" onclick="logout()" style="width:auto;padding:10px 20px;">Sair</button>
-                    </div>
-                </div>
-                
-                ${app.page !== 'edit-stage' ? `
-                <div class="card">
-                    <button class="nav-btn ${app.page==='home'?'active':''}" onclick="goto('home')">🏠 Início</button>
-                    <button class="nav-btn ${app.page==='standings'?'active':''}" onclick="goto('standings')">🏆 Classificação</button>
-                    <button class="nav-btn ${app.page==='pilots'?'active':''}" onclick="goto('pilots')">👥 Pilotos</button>
-                    <button class="nav-btn ${app.page==='karts'?'active':''}" onclick="goto('karts')">🎲 Sorteio de Karts</button>
-                    <button class="nav-btn ${app.page==='stages'?'active':''}" onclick="goto('stages')">📅 Etapas</button>
-                </div>
-                ` : ''}
-                
-                ${content}
-            </div>`;
-
-            // Inicializar classificação se necessário
-            if (app.page === 'standings') {
-                setTimeout(() => showStandings('Dinos'), 100);
-            }
-        }
-
-        // ===== INICIALIZAR =====
-        setTimeout(() => render(), 100);
-    </script>
+            body+=`</tbody></table></div>`;
+          }else body+=`<p style="color:#aaa;font-size:13px;font-style:italic;">Sem dados.</p>`;
+        });
+      }
+      cards+=`<div class="stg-card ${isO?'open':''}" onclick="G.openStageId=G.openStageId==='${stage.id}'?null:'${stage.id}';render()">
+        <div class="stg-hdr"><div><div class="stg-name">${stage.name}</div><div class="stg-date">📅 ${ds}</div></div><span style="font-size:22px;color:#ccc;">${isO?'▲':'▼'}</span></div>
+        ${isO?`<div class="stg-body" onclick="event.stopPropagation()">${body}</div>`:''}
+      </div>`;
+    });
+  }
+  return `<div class="card"><div class="ct">📋 Ranking das Etapas</div>
+    <div class="tabs">
+      <button class="tab ${cat==='Dinos'?'active':''}" onclick="G.viewCat='Dinos';render()">🦕 Dinos</button>
+      <button class="tab ${cat==='Baby Dinos'?'active':''}" onclick="G.viewCat='Baby Dinos';render()">🐣 Baby Dinos</button>
+    </div>
+    <p style="font-size:13px;color:#888;margin-bottom:14px;">Toque em uma etapa para expandir.</p>
+    ${cards}</div>`;
+}
+
+// ====================== MELHORES VOLTAS ======================
+function renderBestLaps(){
+  let html='';
+  ['Dinos','Baby Dinos'].forEach(cat=>{
+    html+=`<div style="margin-bottom:22px;"><div style="font-weight:900;font-size:15px;margin-bottom:10px;">${cat==='Dinos'?'🦕':'🐣'} ${cat}</div>`;
+    let found=false;
+    G.data.stages.forEach(stage=>{
+      const allB=[...(stage.battery1[cat]||[]),...(stage.battery2[cat]||[])].filter(b=>b.bestLap&&!b.disqualified&&!b.didNotParticipate);
+      if(allB.length){allB.sort((a,b)=>a.bestLap.localeCompare(b.bestLap));html+=`<div class="brow"><span style="font-size:26px;">🏁</span><div><div class="btime">${allB[0].bestLap}</div><div class="bpilot">${allB[0].pilotName}</div><div class="bstage">${stage.name} — Baterias</div></div></div>`;found=true;}
+      const q=stage.qualifying[cat]||[];
+      if(q.length){html+=`<div class="brow"><span style="font-size:26px;">⏱</span><div><div class="btime">${q[0].time}</div><div class="bpilot">${q[0].pilotName}</div><div class="bstage">${stage.name} — Qualifying</div></div></div>`;found=true;}
+    });
+    if(!found)html+=`<p style="color:#aaa;font-size:13px;font-style:italic;">Sem dados ainda.</p>`;
+    html+=`</div>`;
+  });
+  return `<div class="card"><div class="ct">⚡ Melhores Voltas</div>${html}</div>`;
+}
+
+// ====================== PRESENÇA ======================
+function renderPresence(){
+  if(!G.data.stages.length)return `<div class="card"><div class="ct">👥 Presença</div><p style="text-align:center;color:#aaa;padding:30px;">Nenhuma etapa ainda.</p></div>`;
+  let html=`<div class="card"><div class="ct">👥 Presença por Etapa</div>`;
+  G.data.stages.forEach(stage=>{
+    const ds=stage.date?new Date(stage.date+'T00:00:00').toLocaleDateString('pt-BR'):'';
+    html+=`<div class="acc"><div class="ach" onclick="toggleAcc('ac_${stage.id}')">📅 ${stage.name} — ${ds} <span>▼</span></div><div class="acb" id="ac_${stage.id}">`;
+    ['Dinos','Baby Dinos'].forEach(cat=>{
+      const b1=stage.battery1[cat]||[];const b2=stage.battery2[cat]||[];
+      const rows=G.data.pilots.filter(p=>p.cat===cat).map(pilot=>{
+        const r1=b1.find(x=>x.pilotId===pilot.id);const r2=b2.find(x=>x.pilotId===pilot.id);
+        let status='sem-dado';
+        if(r1||r2){if((r1&&r1.disqualified)||(r2&&r2.disqualified))status='dcl';else if((r1&&r1.didNotParticipate)&&(!r2||(r2&&r2.didNotParticipate)))status='absent';else status='present';}
+        const name=(r1&&r1.pilotName)||(r2&&r2.pilotName)||pilot.name;
+        return{name,status};
+      });
+      const nP=rows.filter(r=>r.status==='present').length;
+      const nA=rows.filter(r=>r.status==='absent').length;
+      const nD=rows.filter(r=>r.status==='dcl').length;
+      html+=`<div style="margin-bottom:16px;"><div style="font-weight:800;font-size:14px;margin-bottom:8px;">${cat==='Dinos'?'🦕':'🐣'} ${cat}</div>
+        <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:13px;margin-bottom:10px;">
+          <span style="color:#16a34a;">✅ Presentes: <strong>${nP}</strong></span>
+          <span style="color:#dc2626;">❌ Ausentes: <strong>${nA}</strong></span>
+          ${nD?`<span style="color:#c2410c;">⛔ Dclas.: <strong>${nD}</strong></span>`:''}
+        </div><div class="pg">`;
+      rows.forEach(r=>{let cls='',ic='',lb='';if(r.status==='present'){cls='pres';ic='✅';lb='Presente';}else if(r.status==='absent'){cls='abs';ic='❌';lb='Ausente';}else if(r.status==='dcl'){cls='dcl';ic='⛔';lb='Desclassificado';}else{cls='abs';ic='—';lb='Sem dado';}html+=`<div class="pi ${cls}">${ic}<br>${r.name}<br><small>${lb}</small></div>`;});
+      html+=`</div></div>`;
+    });
+    html+=`</div></div>`;
+  });
+  return html+`</div>`;
+}
+
+// ====================== LISTA PILOTOS (visualização) ======================
+function renderPilotList(){
+  const dinos=G.data.pilots.filter(p=>p.cat==='Dinos');
+  const baby=G.data.pilots.filter(p=>p.cat==='Baby Dinos');
+  let html=`<div class="card"><div class="ct">🪖 Pilotos do Campeonato</div>
+    <div class="stats">
+      <div class="stc"><div class="stn">${G.data.pilots.length}</div><div class="stl">Total</div></div>
+      <div class="stc"><div class="stn">${dinos.length}</div><div class="stl">Dinos</div></div>
+      <div class="stc"><div class="stn">${baby.length}</div><div class="stl">Baby Dinos</div></div>
+    </div>
+    <div style="font-weight:900;font-size:14px;margin-bottom:10px;">🦕 Dinos — Senior</div>`;
+  if(!dinos.length)html+=`<p style="color:#aaa;font-size:13px;margin-bottom:14px;">Nenhum piloto.</p>`;
+  dinos.forEach(p=>{html+=`<div class="li"><div style="display:flex;align-items:center;gap:12px;">${p.number?`<div class="pnum">${p.number}</div>`:'<div style="width:36px;height:36px;background:#f3f4f6;border-radius:50%;"></div>'}<strong>${p.name}</strong></div><span class="catd cd">Dinos</span></div>`;});
+  html+=`<div style="font-weight:900;font-size:14px;margin:16px 0 10px;">🐣 Baby Dinos — Graduados</div>`;
+  if(!baby.length)html+=`<p style="color:#aaa;font-size:13px;">Nenhum piloto.</p>`;
+  baby.forEach(p=>{html+=`<div class="li"><div style="display:flex;align-items:center;gap:12px;">${p.number?`<div class="pnum">${p.number}</div>`:'<div style="width:36px;height:36px;background:#f3f4f6;border-radius:50%;"></div>'}<strong>${p.name}</strong></div><span class="catd cb">Baby Dinos</span></div>`;});
+  return html+`</div>`;
+}
+
+// ====================== ADMIN: PAINEL ======================
+function renderHome(){
+  const d=G.data;
+  return `<div class="card"><div class="ct">🏠 Painel do Administrador</div>
+    <div class="stats">
+      <div class="stc"><div class="stn">${d.pilots.length}</div><div class="stl">Pilotos</div></div>
+      <div class="stc"><div class="stn">${d.stages.length}</div><div class="stl">Etapas</div></div>
+      <div class="stc"><div class="stn">${d.karts.length}</div><div class="stl">Karts</div></div>
+    </div>
+    ${d.regulation?`<div style="padding:14px;background:#f9fafb;border-radius:10px;white-space:pre-wrap;font-size:14px;color:#444;margin-top:8px;">${d.regulation}</div>`:''}
+    ${d.partners.length?`<div style="margin-top:14px;"><div style="font-weight:800;font-size:13px;margin-bottom:8px;">🤝 Parceiros</div><div style="display:flex;flex-wrap:wrap;gap:8px;">${d.partners.map(p=>`<span style="background:#f3f4f6;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:700;">${p}</span>`).join('')}</div></div>`:''}
+  </div>`;
+}
+
+// ====================== ADMIN: PILOTOS ======================
+function renderAdmP(){
+  const dinos=G.data.pilots.filter(p=>p.cat==='Dinos');
+  const baby=G.data.pilots.filter(p=>p.cat==='Baby Dinos');
+  return `<div class="card"><div class="ct">👤 Gerenciar Pilotos</div>
+    <div class="fsec"><h3>Adicionar</h3>
+      <form onsubmit="addPilot(event)">
+        <div class="f"><label>Nome</label><input type="text" id="pN" placeholder="Nome do piloto" required></div>
+        <div class="frow">
+          <div class="f"><label>Numero</label><input type="text" id="pNm" placeholder="Ex: 77"></div>
+          <div class="f"><label>Categoria</label><select id="pC"><option value="Dinos">Dinos (Senior)</option><option value="Baby Dinos">Baby Dinos (Graduados)</option></select></div>
+        </div>
+        <button type="submit" class="btn bg">➕ Adicionar</button>
+      </form>
+    </div>
+    <div style="font-weight:900;font-size:14px;margin-bottom:10px;">🦕 Dinos (${dinos.length})</div>
+    ${dinos.map(p=>`<div class="li"><div style="display:flex;align-items:center;gap:12px;">${p.number?`<div class="pnum">${p.number}</div>`:''}<div><strong>${p.name}</strong><br><span class="catd cd">Dinos</span></div></div><button class="dbtn" onclick="delPilot('${p.id}')">Excluir</button></div>`).join('')||'<p style="color:#aaa;margin-bottom:12px;">Nenhum.</p>'}
+    <div style="font-weight:900;font-size:14px;margin:16px 0 10px;">🐣 Baby Dinos (${baby.length})</div>
+    ${baby.map(p=>`<div class="li"><div style="display:flex;align-items:center;gap:12px;">${p.number?`<div class="pnum">${p.number}</div>`:''}<div><strong>${p.name}</strong><br><span class="catd cb">Baby Dinos</span></div></div><button class="dbtn" onclick="delPilot('${p.id}')">Excluir</button></div>`).join('')||'<p style="color:#aaa;">Nenhum.</p>'}
+  </div>`;
+}
+
+// ====================== ADMIN: KARTS ======================
+function renderAdmK(){
+  return `<div class="card"><div class="ct">🎲 Karts</div>
+    <div class="fsec"><h3>Cadastrar</h3>
+      <form onsubmit="addKart(event)">
+        <div class="f"><label>Numero</label><input type="text" id="kN" placeholder="Ex: 01" required></div>
+        <button type="submit" class="btn bg">➕ Adicionar</button>
+      </form>
+    </div>
+    <div class="info ib">ℹ️ O sorteio de cada etapa fica em: Etapas → Editar → aba Sorteio.</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px;">
+      ${G.data.karts.map(k=>`<div style="background:#f9fafb;padding:12px;border-radius:10px;text-align:center;position:relative;border:1px solid #f3f4f6;"><div style="font-weight:900;">Kart ${k.num}</div><button onclick="delKart('${k.id}')" style="position:absolute;top:4px;right:4px;background:#fef2f2;color:#dc2626;border:1px solid #fecaca;border-radius:5px;padding:1px 7px;cursor:pointer;">×</button></div>`).join('')||'<p style="color:#aaa;">Nenhum kart.</p>'}
+    </div>
+  </div>`;
+}
+
+// ====================== ADMIN: ETAPAS ======================
+function renderAdmS(){
+  return `<div class="card"><div class="ct">📅 Gerenciar Etapas</div>
+    <div class="fsec"><h3>Nova Etapa</h3>
+      <form onsubmit="addStage(event)">
+        <div class="frow">
+          <div class="f"><label>Nome</label><input type="text" id="sN" placeholder="Ex: 1a Etapa" required></div>
+          <div class="f"><label>Data</label><input type="date" id="sD" required></div>
+        </div>
+        <button type="submit" class="btn bg">➕ Criar</button>
+      </form>
+    </div>
+    ${G.data.stages.length===0?'<p style="color:#aaa;">Nenhuma etapa.</p>':''}
+    ${G.data.stages.map(s=>`<div class="li"><div><strong>${s.name}</strong><br><span style="font-size:13px;color:#888;">📅 ${new Date(s.date+'T00:00:00').toLocaleDateString('pt-BR')}</span></div><div style="display:flex;gap:8px;"><button class="btn bb bsm" onclick="openEdit('${s.id}')">✏️ Editar</button><button class="dbtn" onclick="delStage('${s.id}')">Excluir</button></div></div>`).join('')}
+  </div>`;
+}
+
+// ====================== ADMIN: EDITOR ETAPA ======================
+function renderEdit(){
+  const stage=G.data.stages.find(s=>s.id===G.editStageId);
+  if(!stage){goto('adm-s');return'';}
+  const tab=G.editTab,cat=G.editCat;
+  const ds=stage.date?new Date(stage.date+'T00:00:00').toLocaleDateString('pt-BR'):'';
+  const pilots=G.data.pilots.filter(p=>p.cat===cat);
+  let body='';
+  if(tab==='draw'){
+    const draw=(stage.kartDraw&&stage.kartDraw[cat])||[];
+    body=`<div class="info ib">🎲 O sorteio fica gravado permanentemente nesta etapa.</div>
+    ${draw.length?`<div style="margin-bottom:16px;"><div style="font-weight:800;margin-bottom:10px;">✅ Sorteio arquivado — ${cat}:</div>${draw.map((r,i)=>`<div class="krow"><div style="display:flex;align-items:center;gap:10px;">${r.pilotNumber?`<div class="pnum">${r.pilotNumber}</div>`:''}<strong>${i+1}. ${r.pilotName}</strong></div><span class="ktag">Kart ${r.kartNum}</span></div>`).join('')}</div>`:`<div class="info iy">⚠️ Nenhum sorteio para ${cat} ainda.</div>`}
+    <form onsubmit="doDraw(event)"><button type="submit" class="btn br">🎲 ${draw.length?'Refazer':'Realizar'} Sorteio — ${cat}</button></form>`;
+  }
+  if(tab==='qualifying'){
+    const ex=stage.qualifying[cat]||[];
+    body=`<div class="info ib">⏱ Melhor tempo de cada piloto nas 2 voltas. Formato: <code>1:23.456</code></div>
+    <form onsubmit="saveQ(event)">
+      ${pilots.map(p=>{const e2=ex.find(x=>x.pilotId===p.id);return `<div class="f"><label>${p.name}${p.number?' #'+p.number:''}</label><input type="text" id="qt_${p.id}" placeholder="1:23.456" value="${e2?e2.time:''}"></div>`;}).join('')}
+      ${!pilots.length?'<p style="color:#aaa;">Nenhum piloto nesta categoria.</p>':''}
+      <button type="submit" class="btn bg">💾 Salvar Qualifying</button>
+    </form>`;
+  }
+  if(tab==='battery1'||tab==='battery2'){
+    const bn=tab==='battery1'?1:2;
+    const ex=stage['battery'+bn][cat]||[];
+    body=`<div class="info ib">🏁 Posicao, melhor volta, penalidades, desclassificados e ausentes.</div>
+    <form onsubmit="saveB(event,${bn})">
+      <div class="tw"><table><thead><tr><th>Piloto</th><th>Posicao</th><th>Melhor Volta</th><th>Penalidade</th><th style="text-align:center">Dclas.</th><th style="text-align:center">N.Part.</th></tr></thead><tbody>
+      ${pilots.map(p=>{const e2=ex.find(x=>x.pilotId===p.id)||{};return `<tr><td><strong>${p.name}</strong>${p.number?`<br><small style="color:#aaa;">#${p.number}</small>`:''}</td><td><input type="number" id="bp${bn}_${p.id}" min="1" placeholder="1" value="${e2.position||''}" style="width:60px;padding:8px;border:2px solid #e5e7eb;border-radius:7px;font-size:15px;"></td><td><input type="text" id="bv${bn}_${p.id}" placeholder="1:23.456" value="${e2.bestLap||''}" style="width:110px;padding:8px;border:2px solid #e5e7eb;border-radius:7px;font-size:15px;"></td><td><input type="number" id="bn${bn}_${p.id}" min="0" value="${e2.penalties||0}" style="width:60px;padding:8px;border:2px solid #e5e7eb;border-radius:7px;font-size:15px;"></td><td style="text-align:center"><input type="checkbox" id="bd${bn}_${p.id}" ${e2.disqualified?'checked':''} style="width:22px;height:22px;cursor:pointer;"></td><td style="text-align:center"><input type="checkbox" id="bx${bn}_${p.id}" ${e2.didNotParticipate?'checked':''} style="width:22px;height:22px;cursor:pointer;"></td></tr>`;}).join('')}
+      </tbody></table></div>
+      ${!pilots.length?'<p style="color:#aaa;margin-top:10px;">Nenhum piloto.</p>':''}
+      <button type="submit" class="btn bg" style="margin-top:14px;">💾 Salvar ${bn}ª Bateria</button>
+    </form>`;
+  }
+  return `<div class="wrap">${renderHeader()}<div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
+      <div><div class="ct" style="margin-bottom:4px;">✏️ ${stage.name}</div><div style="font-size:13px;color:#888;">📅 ${ds}</div></div>
+      <button class="btn bw bsm" onclick="goto('adm-s')">← Voltar</button>
+    </div>
+    <div class="tabs">
+      <button class="tab ${tab==='draw'?'active':''}" onclick="setTab('draw')">🎲 Sorteio</button>
+      <button class="tab ${tab==='qualifying'?'active':''}" onclick="setTab('qualifying')">⏱ Qualifying</button>
+      <button class="tab ${tab==='battery1'?'active':''}" onclick="setTab('battery1')">🏁 1ª Bateria</button>
+      <button class="tab ${tab==='battery2'?'active':''}" onclick="setTab('battery2')">🏁 2ª Bateria</button>
+    </div>
+    <div class="tabs" style="margin-top:-8px;">
+      <button class="tab ${cat==='Dinos'?'active':''}" onclick="setCat('Dinos')">🦕 Dinos</button>
+      <button class="tab ${cat==='Baby Dinos'?'active':''}" onclick="setCat('Baby Dinos')">🐣 Baby Dinos</button>
+    </div>
+    ${body}
+  </div></div>`;
+}
+
+// ====================== ADMIN: CONFIG ======================
+function renderCfg(){
+  const d=G.data;
+  return `<div class="card"><div class="ct">⚙️ Configuracoes</div>
+    <div class="fsec"><h3>Campeonato</h3>
+      <div class="f"><label>Nome</label><input type="text" id="cN" value="${d.name}"></div>
+      <div class="f"><label>Regulamento</label><textarea id="cR" rows="5" style="width:100%;padding:10px;border:2px solid #e5e7eb;border-radius:8px;font-size:14px;line-height:1.5;">${d.regulation||''}</textarea></div>
+      <div class="f"><label>Parceiros (virgula)</label><input type="text" id="cP" value="${d.partners.join(', ')}"></div>
+      <button class="btn bg" onclick="saveCfg()">💾 Salvar</button>
+    </div>
+    <div class="fsec"><h3>Pontuacao</h3>
+      <div class="f"><label>Qualifying — 1o ao ultimo</label><input type="text" id="cQP" value="${d.points.qualifying.join(', ')}"></div>
+      <div class="f"><label>Baterias — 1o ao ultimo</label><input type="text" id="cBP" value="${d.points.battery.join(', ')}"></div>
+      <div class="frow">
+        <div class="f"><label>Bonus melhor volta bateria</label><input type="number" id="cBL" value="${d.points.bestLapBonus}"></div>
+        <div class="f"><label>Bonus melhor volta qualifying</label><input type="number" id="cQL" value="${d.points.bestQualifyBonus}"></div>
+      </div>
+      <button class="btn bg" onclick="savePts()">💾 Salvar Pontuacao</button>
+    </div>
+    <div class="fsec"><h3>Backup</h3>
+      <button class="btn bb" onclick="expData()">📥 Exportar Backup (JSON)</button>
+      <label class="btn bw" style="display:block;text-align:center;cursor:pointer;margin-top:8px;">📤 Importar Backup<input type="file" accept=".json" onchange="impData(event)" style="display:none;"></label>
+    </div>
+    <div class="fsec"><h3>Credenciais de Acesso</h3>
+      <div style="border-radius:10px;overflow:hidden;border:1px solid #f3f4f6;">
+        <div style="display:flex;gap:12px;align-items:center;padding:13px 16px;background:#fff5f5;border-bottom:1px solid #f3f4f6;">
+          <span style="font-size:22px;">👑</span><div><strong>Administrador</strong><br><span style="font-size:13px;color:#666;">usuario: <code>admin</code> | senha: <code>admin123</code></span></div></div>
+        <div style="display:flex;gap:12px;align-items:center;padding:13px 16px;background:#eff6ff;">
+          <span style="font-size:22px;">🪖</span><div><strong>Pilotos (todos compartilham)</strong><br><span style="font-size:13px;color:#666;">usuario: <code>piloto</code> | senha: <code>piloto123</code></span></div></div>
+      </div>
+    </div>
+  </div>`;
+}
+function saveCfg(){G.data.name=document.getElementById('cN').value||G.data.name;G.data.regulation=document.getElementById('cR').value;G.data.partners=(document.getElementById('cP').value||'').split(',').map(x=>x.trim()).filter(Boolean);save();alert('Salvo!');render();}
+function savePts(){G.data.points.qualifying=document.getElementById('cQP').value.split(',').map(x=>parseInt(x)).filter(n=>!isNaN(n));G.data.points.battery=document.getElementById('cBP').value.split(',').map(x=>parseInt(x)).filter(n=>!isNaN(n));G.data.points.bestLapBonus=parseInt(document.getElementById('cBL').value)||0;G.data.points.bestQualifyBonus=parseInt(document.getElementById('cQL').value)||0;save();alert('Pontuacao salva!');}
+function expData(){const blob=new Blob([JSON.stringify(G.data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='kart-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click();}
+function impData(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{G.data=JSON.parse(ev.target.result);save();alert('Importado!');render();}catch{alert('Arquivo invalido.');}};r.readAsText(f);}
+
+// ====================== RENDER PRINCIPAL ======================
+function render(){
+  const el=document.getElementById('APP');if(!el)return;
+  if(!G.user){el.innerHTML=renderLogin();return;}
+  if(G.page==='edit'){el.innerHTML=renderEdit();return;}
+  const adminPages=['home','adm-p','adm-k','adm-s','cfg'];
+  if(G.user.role!=='admin'&&adminPages.includes(G.page))G.page='standings';
+  let content='';const p=G.page;
+  if(p==='standings')content=renderStandings();
+  else if(p==='stage-view')content=renderStageView();
+  else if(p==='bestlaps')content=renderBestLaps();
+  else if(p==='presence')content=renderPresence();
+  else if(p==='pilot-list')content=renderPilotList();
+  else if(p==='home')content=renderHome();
+  else if(p==='adm-p')content=renderAdmP();
+  else if(p==='adm-k')content=renderAdmK();
+  else if(p==='adm-s')content=renderAdmS();
+  else if(p==='cfg')content=renderCfg();
+  else content=G.user.role==='admin'?renderHome():renderStandings();
+  const bar=G.user.role==='pilot'?`<div class="readonly-bar">👁 Modo Visualização — Somente Leitura</div>`:'';
+  el.innerHTML=`<div class="wrap">${renderHeader()}${renderNav()}${bar}${content}</div>`;
+}
+setTimeout(()=>render(),50);
+</script>
 </body>
 </html>
