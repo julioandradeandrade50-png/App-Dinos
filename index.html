@@ -132,6 +132,7 @@ let G={
   viewCat:'Dinos',standCat:'Dinos',openStageId:null,
   data:DB.get('kart_data')||{
     name:'Campeonato de Kart Rental',regulation:'',partners:[],
+    logoChampionship:'',partnerLogos:[],
     pilots:[],karts:[],stages:[],
     points:{qualifying:[10,9,8,7,6,5,4,3,2,1],battery:[25,22,20,18,16,14,12,10,8,6,4,2],bestLapBonus:1,bestQualifyBonus:1}
   }
@@ -150,6 +151,34 @@ function doLogin(e){
 }
 function logout(){G.user=null;DB.set('kart_sess',null);render()}
 function goto(p){G.page=p;G.editStageId=null;render()}
+
+
+// ====================== LOGOS ======================
+function uploadChampLogo(e){
+  const file=e.target.files[0];if(!file)return;
+  if(!file.type.startsWith('image/'))return alert('Selecione uma imagem válida!');
+  if(file.size>500000)return alert('Imagem muito grande! Max 500KB');
+  const reader=new FileReader();
+  reader.onload=ev=>{G.data.logoChampionship=ev.target.result;save();alert('✅ Logo do campeonato salva!');render();};
+  reader.readAsDataURL(file);
+}
+function removeChampLogo(){if(!confirm('Remover logo do campeonato?'))return;G.data.logoChampionship='';save();render();}
+function addPartnerLogo(e){
+  e.preventDefault();
+  const name=document.getElementById('plName').value.trim();
+  const file=document.getElementById('plFile').files[0];
+  if(!name)return alert('Digite o nome do parceiro!');
+  if(!file)return alert('Selecione uma imagem!');
+  if(!file.type.startsWith('image/'))return alert('Arquivo deve ser uma imagem!');
+  if(file.size>300000)return alert('Imagem muito grande! Max 300KB');
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    G.data.partnerLogos.push({id:uid(),name,logo:ev.target.result});
+    save();alert('✅ Logo do parceiro adicionada!');render();
+  };
+  reader.readAsDataURL(file);
+}
+function delPartnerLogo(id){if(!confirm('Remover logo?'))return;G.data.partnerLogos=G.data.partnerLogos.filter(p=>p.id!==id);save();render();}
 
 // ====================== PILOTOS ======================
 function addPilot(e){
@@ -260,7 +289,9 @@ function toggleAcc(id){const el=document.getElementById(id);if(el)el.classList.t
 // ====================== LOGIN RENDER ======================
 function renderLogin(){
   return `<div class="login-wrap"><div class="login-box">
-    <div class="login-logo"><span class="ico">🏎️</span><h1>${G.data.name}</h1><p>Sistema de Gerenciamento</p></div>
+    <div class="login-logo">
+      ${G.data.logoChampionship?`<img src="${G.data.logoChampionship}" style="max-width:120px;max-height:120px;margin-bottom:10px;border-radius:12px;">`:'<span class="ico">🏎️</span>'}
+      <h1>${G.data.name}</h1><p>Sistema de Gerenciamento</p></div>
     <div id="lerr" class="err"></div>
     <form onsubmit="doLogin(event)">
       <div class="lfield"><label>Usuário</label><input type="text" id="lU" placeholder="Digite seu usuário" required autocomplete="username"></div>
@@ -273,7 +304,9 @@ function renderLogin(){
 // ====================== HEADER ======================
 function renderHeader(){
   const isA=G.user&&G.user.role==='admin';
-  return `<div class="hdr"><div><h2>🏎️ ${G.data.name}</h2><p><span class="rb ${isA?'rb-a':'rb-p'}">${isA?'Admin':'Piloto'}</span>${G.user.name}</p></div><button class="btn-out" onclick="logout()">Sair ↩</button></div>`;
+  return `<div class="hdr"><div style="display:flex;align-items:center;gap:10px;">
+      ${G.data.logoChampionship?`<img src="${G.data.logoChampionship}" style="width:40px;height:40px;border-radius:8px;object-fit:cover;">`:''}
+      <h2>${G.data.logoChampionship?'':'🏎️ '}${G.data.name}</h2><p><span class="rb ${isA?'rb-a':'rb-p'}">${isA?'Admin':'Piloto'}</span>${G.user.name}</p></div><button class="btn-out" onclick="logout()">Sair ↩</button></div>`;
 }
 
 // ====================== NAV ======================
@@ -589,7 +622,21 @@ function renderCfg(){
     <div class="fsec"><h3>Campeonato</h3>
       <div class="f"><label>Nome</label><input type="text" id="cN" value="${d.name}"></div>
       <div class="f"><label>Regulamento</label><textarea id="cR" rows="5" style="width:100%;padding:10px;border:2px solid #e5e7eb;border-radius:8px;font-size:14px;line-height:1.5;">${d.regulation||''}</textarea></div>
-      <div class="f"><label>Parceiros (virgula)</label><input type="text" id="cP" value="${d.partners.join(', ')}"></div>
+      <div class="f"><label>Parceiros (legado - use logos abaixo)</label><input type="text" id="cP" value="${d.partners.join(', ')}" placeholder="Deixe em branco se usar logos"></div>
+    </div>
+    <div class="fsec"><h3>Logo do Campeonato</h3>
+      ${d.logoChampionship?`<div style="text-align:center;margin-bottom:12px;"><img src="${d.logoChampionship}" style="max-width:150px;max-height:150px;border-radius:12px;border:2px solid #f3f4f6;"><br><button class="btn br bsm" onclick="removeChampLogo()" style="margin-top:10px;">🗑️ Remover Logo</button></div>`:'<div class="info ib" style="margin-bottom:12px;">Nenhuma logo ainda. Adicione abaixo.</div>'}
+      <label class="btn bb" style="display:block;text-align:center;cursor:pointer;">📤 Upload Logo do Campeonato<input type="file" accept="image/*" onchange="uploadChampLogo(event)" style="display:none;"></label>
+      <p style="font-size:12px;color:#888;margin-top:8px;text-align:center;">Max 500KB • Formatos: JPG, PNG, GIF</p>
+    </div>
+    <div class="fsec"><h3>Logos dos Parceiros</h3>
+      ${d.partnerLogos.length?`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:14px;">${d.partnerLogos.map(p=>`<div style="background:white;padding:10px;border-radius:10px;border:1px solid #f3f4f6;text-align:center;position:relative;"><img src="${p.logo}" style="max-width:100%;max-height:60px;object-fit:contain;margin-bottom:6px;"><div style="font-size:12px;font-weight:700;color:#333;">${p.name}</div><button onclick="delPartnerLogo('${p.id}')" style="position:absolute;top:4px;right:4px;background:#fef2f2;color:#dc2626;border:1px solid #fecaca;border-radius:5px;padding:2px 8px;cursor:pointer;font-size:12px;">×</button></div>`).join('')}</div>`:'<div class="info iy" style="margin-bottom:12px;">Nenhum parceiro ainda. Adicione abaixo.</div>'}
+      <form onsubmit="addPartnerLogo(event)">
+        <div class="f"><label>Nome do Parceiro</label><input type="text" id="plName" placeholder="Ex: Empresa XYZ"></div>
+        <div class="f"><label>Logo do Parceiro</label><input type="file" id="plFile" accept="image/*" style="padding:8px;"></div>
+        <p style="font-size:12px;color:#888;margin-bottom:8px;">Max 300KB • Formatos: JPG, PNG, GIF</p>
+        <button type="submit" class="btn bg">➕ Adicionar Parceiro</button>
+      </form>
       <button class="btn bg" onclick="saveCfg()">💾 Salvar</button>
     </div>
     <div class="fsec"><h3>Pontuacao</h3>
