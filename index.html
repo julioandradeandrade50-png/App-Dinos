@@ -288,6 +288,9 @@ function toggleAcc(id){const el=document.getElementById(id);if(el)el.classList.t
 
 // ====================== LOGIN RENDER ======================
 function renderLogin(){
+  // Garantir que partnerLogos existe
+  if(!G.data.partnerLogos) G.data.partnerLogos=[];
+  
   return `<div class="login-wrap"><div class="login-box">
     <div class="login-logo">
       ${G.data.logoChampionship?`<img src="${G.data.logoChampionship}" style="max-width:120px;max-height:120px;margin-bottom:10px;border-radius:12px;">`:'<span class="ico">🏎️</span>'}
@@ -298,6 +301,14 @@ function renderLogin(){
       <div class="lfield"><label>Senha</label><input type="password" id="lP" placeholder="Digite sua senha" required autocomplete="current-password"></div>
       <button type="submit" class="btn-login">Entrar →</button>
     </form>
+    ${G.data.partnerLogos&&G.data.partnerLogos.length?`
+      <div style="margin-top:24px;padding-top:20px;border-top:1px solid #f3f4f6;">
+        <div style="text-align:center;font-size:12px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px;">Patrocinadores</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(80px,1fr));gap:10px;align-items:center;">
+          ${G.data.partnerLogos.map(p=>`<div style="background:#fafafa;padding:10px;border-radius:8px;border:1px solid #f3f4f6;display:flex;align-items:center;justify-content:center;min-height:60px;"><img src="${p.logo}" alt="${p.name}" style="max-width:100%;max-height:45px;object-fit:contain;" title="${p.name}"></div>`).join('')}
+        </div>
+      </div>
+    `:''}
   </div></div>`;
 }
 
