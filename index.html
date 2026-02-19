@@ -618,11 +618,16 @@ function renderEdit(){
 // ====================== ADMIN: CONFIG ======================
 function renderCfg(){
   const d=G.data;
+  // Garantir que partnerLogos existe
+  if(!d.partnerLogos) d.partnerLogos=[];
+  if(!d.logoChampionship) d.logoChampionship='';
+  
   return `<div class="card"><div class="ct">⚙️ Configuracoes</div>
     <div class="fsec"><h3>Campeonato</h3>
       <div class="f"><label>Nome</label><input type="text" id="cN" value="${d.name}"></div>
       <div class="f"><label>Regulamento</label><textarea id="cR" rows="5" style="width:100%;padding:10px;border:2px solid #e5e7eb;border-radius:8px;font-size:14px;line-height:1.5;">${d.regulation||''}</textarea></div>
-      <div class="f"><label>Parceiros (legado - use logos abaixo)</label><input type="text" id="cP" value="${d.partners.join(', ')}" placeholder="Deixe em branco se usar logos"></div>
+      <div class="f"><label>Parceiros (legado - use logos abaixo)</label><input type="text" id="cP" value="${(d.partners||[]).join(', ')}" placeholder="Deixe em branco se usar logos"></div>
+      <button class="btn bg" onclick="saveCfg()">💾 Salvar Informações</button>
     </div>
     <div class="fsec"><h3>Logo do Campeonato</h3>
       ${d.logoChampionship?`<div style="text-align:center;margin-bottom:12px;"><img src="${d.logoChampionship}" style="max-width:150px;max-height:150px;border-radius:12px;border:2px solid #f3f4f6;"><br><button class="btn br bsm" onclick="removeChampLogo()" style="margin-top:10px;">🗑️ Remover Logo</button></div>`:'<div class="info ib" style="margin-bottom:12px;">Nenhuma logo ainda. Adicione abaixo.</div>'}
@@ -630,7 +635,7 @@ function renderCfg(){
       <p style="font-size:12px;color:#888;margin-top:8px;text-align:center;">Max 500KB • Formatos: JPG, PNG, GIF</p>
     </div>
     <div class="fsec"><h3>Logos dos Parceiros</h3>
-      ${d.partnerLogos.length?`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:14px;">${d.partnerLogos.map(p=>`<div style="background:white;padding:10px;border-radius:10px;border:1px solid #f3f4f6;text-align:center;position:relative;"><img src="${p.logo}" style="max-width:100%;max-height:60px;object-fit:contain;margin-bottom:6px;"><div style="font-size:12px;font-weight:700;color:#333;">${p.name}</div><button onclick="delPartnerLogo('${p.id}')" style="position:absolute;top:4px;right:4px;background:#fef2f2;color:#dc2626;border:1px solid #fecaca;border-radius:5px;padding:2px 8px;cursor:pointer;font-size:12px;">×</button></div>`).join('')}</div>`:'<div class="info iy" style="margin-bottom:12px;">Nenhum parceiro ainda. Adicione abaixo.</div>'}
+      ${d.partnerLogos&&d.partnerLogos.length?`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:14px;">${d.partnerLogos.map(p=>`<div style="background:white;padding:10px;border-radius:10px;border:1px solid #f3f4f6;text-align:center;position:relative;"><img src="${p.logo}" style="max-width:100%;max-height:60px;object-fit:contain;margin-bottom:6px;"><div style="font-size:12px;font-weight:700;color:#333;">${p.name}</div><button onclick="delPartnerLogo('${p.id}')" style="position:absolute;top:4px;right:4px;background:#fef2f2;color:#dc2626;border:1px solid #fecaca;border-radius:5px;padding:2px 8px;cursor:pointer;font-size:12px;">×</button></div>`).join('')}</div>`:'<div class="info iy" style="margin-bottom:12px;">Nenhum parceiro ainda. Adicione abaixo.</div>'}
       <form onsubmit="addPartnerLogo(event)">
         <div class="f"><label>Nome do Parceiro</label><input type="text" id="plName" placeholder="Ex: Empresa XYZ"></div>
         <div class="f"><label>Logo do Parceiro</label><input type="file" id="plFile" accept="image/*" style="padding:8px;"></div>
@@ -662,7 +667,7 @@ function renderCfg(){
     </div>
   </div>`;
 }
-function saveCfg(){G.data.name=document.getElementById('cN').value||G.data.name;G.data.regulation=document.getElementById('cR').value;G.data.partners=(document.getElementById('cP').value||'').split(',').map(x=>x.trim()).filter(Boolean);save();alert('Salvo!');render();}
+function saveCfg(){G.data.name=document.getElementById('cN').value||G.data.name;G.data.regulation=document.getElementById('cR').value;G.data.partners=(document.getElementById('cP').value||'').split(',').map(x=>x.trim()).filter(Boolean);save();alert('✅ Configurações salvas!');render();}
 function savePts(){G.data.points.qualifying=document.getElementById('cQP').value.split(',').map(x=>parseInt(x)).filter(n=>!isNaN(n));G.data.points.battery=document.getElementById('cBP').value.split(',').map(x=>parseInt(x)).filter(n=>!isNaN(n));G.data.points.bestLapBonus=parseInt(document.getElementById('cBL').value)||0;G.data.points.bestQualifyBonus=parseInt(document.getElementById('cQL').value)||0;save();alert('Pontuacao salva!');}
 function expData(){const blob=new Blob([JSON.stringify(G.data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='kart-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click();}
 function impData(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{G.data=JSON.parse(ev.target.result);save();alert('Importado!');render();}catch{alert('Arquivo invalido.');}};r.readAsText(f);}
