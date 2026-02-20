@@ -114,6 +114,27 @@ tr:hover td{background:#fafafa}
 .iy{background:#fffbeb;border:1px solid #fde68a;color:#92400e}
 .readonly-bar{background:linear-gradient(135deg,#1e40af,#1d4ed8);color:white;border-radius:10px;padding:10px 16px;font-size:13px;font-weight:700;text-align:center;margin-bottom:14px}
 @media(max-width:600px){.frow{grid-template-columns:1fr}.podium{gap:8px}.pp{min-width:95px}.hdr h2{font-size:15px}td,th{padding:8px 10px;font-size:13px}}
+
+
+.pts-breakdown{display:inline-block;padding:4px 8px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;font-size:11px;font-weight:700;color:#1e40af;margin-left:6px}
+.penalty-note{display:block;margin-top:4px;padding:6px 10px;background:#fffbeb;border-left:3px solid #f59e0b;font-size:12px;color:#92400e;border-radius:4px}
+.dcl-note{display:block;margin-top:4px;padding:6px 10px;background:#fef2f2;border-left:3px solid #dc2626;font-size:12px;color:#991b1b;border-radius:4px}
+/* ===== DASHBOARD PÚBLICO ===== */
+.public-wrap{background:linear-gradient(135deg,#1a1a2e,#16213e);min-height:100vh;padding:20px 0}
+.public-header{background:rgba(255,255,255,.1);backdrop-filter:blur(10px);border-radius:16px;padding:20px 30px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px}
+.public-header h1{color:white;font-size:24px;font-weight:900;margin:0;display:flex;align-items:center;gap:12px}
+.public-header .logo-small{width:50px;height:50px;border-radius:10px;object-fit:cover}
+.public-nav{display:flex;gap:8px;flex-wrap:wrap}
+.public-nav-btn{padding:10px 18px;background:rgba(255,255,255,.15);color:white;border:none;border-radius:10px;cursor:pointer;font-size:14px;font-weight:700;transition:all .2s}
+.public-nav-btn:hover{background:rgba(255,255,255,.25)}
+.public-nav-btn.active{background:#dc2626}
+.public-card{background:white;border-radius:16px;padding:25px;margin-bottom:20px;box-shadow:0 4px 20px rgba(0,0,0,.15)}
+.public-title{font-size:22px;font-weight:900;color:#1a1a2e;margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.dash-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:15px;margin-bottom:25px}
+.dash-stat{background:linear-gradient(135deg,#dc2626,#991b1b);color:white;padding:25px;border-radius:14px;text-align:center;box-shadow:0 4px 12px rgba(220,38,38,.3)}
+.dash-stat-num{font-size:42px;font-weight:900;line-height:1;margin-bottom:8px}
+.dash-stat-label{font-size:13px;opacity:.9;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.public-footer{text-align:center;padding:30px 20px;color:rgba(255,255,255,.6);font-size:13px}
 </style>
 </head>
 <body>
@@ -126,8 +147,14 @@ const DB={get(k){try{const d=localStorage.getItem(k);return d?JSON.parse(d):null
 const CREDS={admin:{u:'admin',p:'admin123'},pilot:{u:'piloto',p:'piloto123'}};
 
 // ====================== ESTADO ======================
+// Detectar modo público via URL
+const urlParams=new URLSearchParams(window.location.search);
+const isPublicView=urlParams.get('view')==='public';
+
 let G={
-  user:DB.get('kart_sess'),page:'standings',
+  user:isPublicView?{role:'public',name:'Público'}:DB.get('kart_sess'),
+  page:'standings',
+  isPublic:isPublicView,
   editStageId:null,editTab:'draw',editCat:'Dinos',
   viewCat:'Dinos',standCat:'Dinos',openStageId:null,
   data:DB.get('kart_data')||{
@@ -179,6 +206,41 @@ function addPartnerLogo(e){
   reader.readAsDataURL(file);
 }
 function delPartnerLogo(id){if(!confirm('Remover logo?'))return;G.data.partnerLogos=G.data.partnerLogos.filter(p=>p.id!==id);save();render();}
+
+
+// ===== FUNÇÕES AUXILIARES PARA INTERFACE =====
+function updatePtsPreview(bn,pid){
+  const pos=parseInt(document.getElementById('bp'+bn+'_'+pid).value)||0;
+  const extra=parseInt(document.getElementById('be'+bn+'_'+pid).value)||0;
+  const pen=parseInt(document.getElementById('bn'+bn+'_'+pid).value)||0;
+  const base=pos>0?(G.data.points.battery[pos-1]||0):0;
+  const total=Math.max(0,base+extra-pen);
+  // Atualizar preview seria ideal, mas por simplicidade deixamos para salvar
+}
+function toggleDcl(bn,pid){
+  const checked=document.getElementById('bd'+bn+'_'+pid).checked;
+  const el=document.getElementById('dclr'+bn+'_'+pid);
+  if(el)el.style.display=checked?'block':'none';
+}
+
+
+// Retrocompatibilidade: converter dados antigos para novo formato
+function ensureDataCompat(){
+  G.data.stages.forEach(stage=>{
+    ['battery1','battery2'].forEach(bk=>{
+      ['Dinos','Baby Dinos'].forEach(cat=>{
+        if(stage[bk]&&stage[bk][cat]){
+          stage[bk][cat]=stage[bk][cat].map(r=>{
+            if(!r.pointsBase&&r.points){
+              return {...r,pointsBase:r.points,pointsExtra:0,pointsTotal:r.points,penaltyReason:'',disqualificationReason:''};
+            }
+            return r;
+          });
+        }
+      });
+    });
+  });
+}
 
 // ====================== PILOTOS ======================
 function addPilot(e){
@@ -257,13 +319,17 @@ function saveB(e,bn){
   G.data.pilots.filter(p=>p.cat===cat).forEach(pilot=>{
     const pos=parseInt((document.getElementById('bp'+bn+'_'+pilot.id)||{}).value)||0;
     const pen=parseInt((document.getElementById('bn'+bn+'_'+pilot.id)||{}).value)||0;
+    const extra=parseInt((document.getElementById('be'+bn+'_'+pilot.id)||{}).value)||0;
+    const penReason=(document.getElementById('br'+bn+'_'+pilot.id)||{}).value||'';
     const vl=(document.getElementById('bv'+bn+'_'+pilot.id)||{}).value||'';
     const dcl=(document.getElementById('bd'+bn+'_'+pilot.id)||{}).checked||false;
+    const dclReason=(document.getElementById('bdr'+bn+'_'+pilot.id)||{}).value||'';
     const dnp=(document.getElementById('bx'+bn+'_'+pilot.id)||{}).checked||false;
-    let pts=0;if(!dcl&&!dnp&&pos>0)pts=G.data.points.battery[pos-1]||0;
-    results.push({pilotId:pilot.id,pilotName:pilot.name,pilotNumber:pilot.number,position:pos,points:pts,penalties:pen,bestLap:vl.trim(),disqualified:dcl,didNotParticipate:dnp});
+    let ptsBase=0;if(!dcl&&!dnp&&pos>0)ptsBase=G.data.points.battery[pos-1]||0;
+    const ptsTotal=Math.max(0,ptsBase+extra-pen);
+    results.push({pilotId:pilot.id,pilotName:pilot.name,pilotNumber:pilot.number,position:pos,pointsBase:ptsBase,pointsExtra:extra,penalties:pen,penaltyReason:penReason,pointsTotal:ptsTotal,bestLap:vl.trim(),disqualified:dcl,disqualificationReason:dclReason,didNotParticipate:dnp});
   });
-  stage['battery'+bn][cat]=results;save();alert(bn+'a Bateria salva!');render();
+  stage['battery'+bn][cat]=results;save();alert('✅ '+bn+'ª Bateria salva com sucesso!\n\nPontos calculados automaticamente.');render();
 }
 
 // ====================== CALCULO ======================
@@ -274,7 +340,7 @@ function calcSt(cat){
       let sp=0,bonus=0,pen=0;
       const q=(stage.qualifying[cat]||[]).find(x=>x.pilotId===pilot.id);
       if(q){sp+=q.points||0;if((stage.qualifying[cat]||[])[0]?.pilotId===pilot.id)bonus+=G.data.points.bestQualifyBonus;}
-      ['battery1','battery2'].forEach(bk=>{const b=(stage[bk][cat]||[]).find(x=>x.pilotId===pilot.id);if(b&&!b.disqualified&&!b.didNotParticipate){sp+=b.points||0;pen+=b.penalties||0;}});
+      ['battery1','battery2'].forEach(bk=>{const b=(stage[bk][cat]||[]).find(x=>x.pilotId===pilot.id);if(b&&!b.disqualified&&!b.didNotParticipate){sp+=(b.pointsTotal||b.points||0);}});
       const allB=[...(stage.battery1[cat]||[]),...(stage.battery2[cat]||[])].filter(b=>b.bestLap&&!b.disqualified&&!b.didNotParticipate);
       if(allB.length){allB.sort((a,b)=>a.bestLap.localeCompare(b.bestLap));if(allB[0].pilotId===pilot.id)bonus+=G.data.points.bestLapBonus;}
       const fp=sp+bonus-pen;total+=fp;
@@ -301,6 +367,9 @@ function renderLogin(){
       <div class="lfield"><label>Senha</label><input type="password" id="lP" placeholder="Digite sua senha" required autocomplete="current-password"></div>
       <button type="submit" class="btn-login">Entrar →</button>
     </form>
+    <div style="margin-top:20px;text-align:center;font-size:12px;color:#888;">
+      <a href="?view=public" style="color:#3b82f6;text-decoration:none;font-weight:700;">📊 Ver Dashboard Público</a>
+    </div>
     ${G.data.partnerLogos&&G.data.partnerLogos.length?`
       <div style="margin-top:24px;padding-top:20px;border-top:1px solid #f3f4f6;">
         <div style="text-align:center;font-size:12px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px;">Patrocinadores</div>
@@ -683,9 +752,77 @@ function savePts(){G.data.points.qualifying=document.getElementById('cQP').value
 function expData(){const blob=new Blob([JSON.stringify(G.data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='kart-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click();}
 function impData(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{G.data=JSON.parse(ev.target.result);save();alert('Importado!');render();}catch{alert('Arquivo invalido.');}};r.readAsText(f);}
 
+
+// ====================== DASHBOARD PÚBLICO ======================
+function renderPublicDashboard(){
+  const d=G.data;
+  if(!d.partnerLogos)d.partnerLogos=[];
+  const page=G.page;
+  
+  let content='';
+  if(page==='standings')content=renderStandings();
+  else if(page==='stage-view')content=renderStageView();
+  else if(page==='bestlaps')content=renderBestLaps();
+  else if(page==='presence')content=renderPresence();
+  else if(page==='pilot-list')content=renderPilotList();
+  else{
+    // Home do dashboard público
+    const dinos=d.pilots.filter(p=>p.cat==='Dinos');
+    const baby=d.pilots.filter(p=>p.cat==='Baby Dinos');
+    content=`
+    <div class="public-card">
+      <div class="public-title">📊 Estatísticas do Campeonato</div>
+      <div class="dash-stats">
+        <div class="dash-stat"><div class="dash-stat-num">${d.pilots.length}</div><div class="dash-stat-label">Pilotos</div></div>
+        <div class="dash-stat"><div class="dash-stat-num">${d.stages.length}</div><div class="dash-stat-label">Etapas</div></div>
+        <div class="dash-stat"><div class="dash-stat-num">${d.karts.length}</div><div class="dash-stat-label">Karts</div></div>
+        <div class="dash-stat"><div class="dash-stat-num">2</div><div class="dash-stat-label">Categorias</div></div>
+      </div>
+      ${d.regulation?`<div style="padding:16px;background:#f9fafb;border-radius:12px;white-space:pre-wrap;font-size:14px;color:#555;line-height:1.6;">${d.regulation}</div>`:''}
+    </div>
+    ${renderStandings()}
+    `;
+  }
+  
+  return `
+  <div class="public-wrap">
+    <div class="wrap">
+      <div class="public-header">
+        <h1>
+          ${d.logoChampionship?`<img src="${d.logoChampionship}" class="logo-small">`:'🏎️'}
+          ${d.name}
+        </h1>
+        <div class="public-nav">
+          <button class="public-nav-btn ${page==='standings'||!page?'active':''}" onclick="G.page='standings';render()">🏆 Rankings</button>
+          <button class="public-nav-btn ${page==='stage-view'?'active':''}" onclick="G.page='stage-view';render()">📋 Etapas</button>
+          <button class="public-nav-btn ${page==='bestlaps'?'active':''}" onclick="G.page='bestlaps';render()">⚡ Voltas</button>
+          <button class="public-nav-btn ${page==='presence'?'active':''}" onclick="G.page='presence';render()">👥 Presença</button>
+          <button class="public-nav-btn ${page==='pilot-list'?'active':''}" onclick="G.page='pilot-list';render()">🪖 Pilotos</button>
+          <button class="public-nav-btn" onclick="window.location.href=window.location.pathname" style="background:#10b981;">🔐 Login</button>
+        </div>
+      </div>
+      ${content}
+      ${d.partnerLogos&&d.partnerLogos.length?`
+        <div class="public-card">
+          <div class="public-title">🤝 Patrocinadores</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:15px;">
+            ${d.partnerLogos.map(p=>`<div style="background:#fafafa;padding:15px;border-radius:10px;border:1px solid #f3f4f6;display:flex;align-items:center;justify-content:center;min-height:80px;"><img src="${p.logo}" alt="${p.name}" style="max-width:100%;max-height:60px;object-fit:contain;" title="${p.name}"></div>`).join('')}
+          </div>
+        </div>
+      `:''}
+      <div class="public-footer">
+        ${d.name} © ${new Date().getFullYear()}<br>
+        Sistema de Gerenciamento de Campeonato
+      </div>
+    </div>
+  </div>`;
+}
+
 // ====================== RENDER PRINCIPAL ======================
 function render(){
+  ensureDataCompat();
   const el=document.getElementById('APP');if(!el)return;
+  if(G.isPublic){el.innerHTML=renderPublicDashboard();return;}
   if(!G.user){el.innerHTML=renderLogin();return;}
   if(G.page==='edit'){el.innerHTML=renderEdit();return;}
   const adminPages=['home','adm-p','adm-k','adm-s','cfg'];
