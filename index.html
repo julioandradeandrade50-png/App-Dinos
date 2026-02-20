@@ -208,6 +208,9 @@ function addPartnerLogo(e){
 function delPartnerLogo(id){if(!confirm('Remover logo?'))return;G.data.partnerLogos=G.data.partnerLogos.filter(p=>p.id!==id);save();render();}
 
 
+
+function getCatLabel(cat){return cat==='Dinos'?'DINOS SENIOR':'DINOS GRADUADOS';}
+
 // ===== FUNÇÕES AUXILIARES PARA INTERFACE =====
 function updatePtsPreview(bn,pid){
   const pos=parseInt(document.getElementById('bp'+bn+'_'+pid).value)||0;
@@ -228,7 +231,8 @@ function toggleDcl(bn,pid){
 function ensureDataCompat(){
   G.data.stages.forEach(stage=>{
     ['battery1','battery2'].forEach(bk=>{
-      ['Dinos','Dinos  GRADUADOS'].forEach(cat=>{
+      ['Dinos','Baby Dinos'].forEach(cat=>{
+        const catLabel=cat==='Dinos'?'DINOS SENIOR':'DINOS GRADUADOS';
         if(stage[bk]&&stage[bk][cat]){
           stage[bk][cat]=stage[bk][cat].map(r=>{
             if(!r.pointsBase&&r.points){
@@ -441,8 +445,8 @@ function renderStandings(){
   tbl+=`</tbody></table></div>`;
   return `<div class="card"><div class="ct">🏆 Ranking Geral</div>
     <div class="tabs">
-      <button class="tab ${cat==='Dinos'?'active':''}" onclick="G.standCat='Dinos';render()">🦕 Dinos — Senior</button>
-      <button class="tab ${cat==='Baby Dinos'?'active':''}" onclick="G.standCat='Baby Dinos';render()">🐣 Baby Dinos — Graduados</button>
+      <button class="tab ${cat==='Dinos'?'active':''}" onclick="G.standCat='Dinos';render()">🦕 DINOS SENIOR</button>
+      <button class="tab ${cat==='Baby Dinos'?'active':''}" onclick="G.standCat='Baby Dinos';render()">🐣 DINOS GRADUADOS</button>
     </div>${pod}${tbl}</div>`;
 }
 
@@ -495,8 +499,8 @@ function renderStageView(){
   }
   return `<div class="card"><div class="ct">📋 Ranking das Etapas</div>
     <div class="tabs">
-      <button class="tab ${cat==='Dinos'?'active':''}" onclick="G.viewCat='Dinos';render()">🦕 Dinos</button>
-      <button class="tab ${cat==='Baby Dinos'?'active':''}" onclick="G.viewCat='Baby Dinos';render()">🐣 Baby Dinos</button>
+      <button class="tab ${cat==='Dinos'?'active':''}" onclick="G.viewCat='Dinos';render()">🦕 DINOS SENIOR</button>
+      <button class="tab ${cat==='Baby Dinos'?'active':''}" onclick="G.viewCat='Baby Dinos';render()">🐣 DINOS GRADUADOS</button>
     </div>
     <p style="font-size:13px;color:#888;margin-bottom:14px;">Toque em uma etapa para expandir.</p>
     ${cards}</div>`;
@@ -506,7 +510,8 @@ function renderStageView(){
 function renderBestLaps(){
   let html='';
   ['Dinos','Baby Dinos'].forEach(cat=>{
-    html+=`<div style="margin-bottom:22px;"><div style="font-weight:900;font-size:15px;margin-bottom:10px;">${cat==='Dinos'?'🦕':'🐣'} ${cat}</div>`;
+        const catLabel=cat==='Dinos'?'DINOS SENIOR':'DINOS GRADUADOS';
+    html+=`<div style="margin-bottom:22px;"><div style="font-weight:900;font-size:15px;margin-bottom:10px;">${cat==='Dinos'?'🦕':'🐣'} ${cat==='Dinos'?'DINOS SENIOR':'DINOS GRADUADOS'}</div>`;
     let found=false;
     G.data.stages.forEach(stage=>{
       const allB=[...(stage.battery1[cat]||[]),...(stage.battery2[cat]||[])].filter(b=>b.bestLap&&!b.disqualified&&!b.didNotParticipate);
@@ -528,6 +533,7 @@ function renderPresence(){
     const ds=stage.date?new Date(stage.date+'T00:00:00').toLocaleDateString('pt-BR'):'';
     html+=`<div class="acc"><div class="ach" onclick="toggleAcc('ac_${stage.id}')">📅 ${stage.name} — ${ds} <span>▼</span></div><div class="acb" id="ac_${stage.id}">`;
     ['Dinos','Baby Dinos'].forEach(cat=>{
+        const catLabel=cat==='Dinos'?'DINOS SENIOR':'DINOS GRADUADOS';
       const b1=stage.battery1[cat]||[];const b2=stage.battery2[cat]||[];
       const rows=G.data.pilots.filter(p=>p.cat===cat).map(pilot=>{
         const r1=b1.find(x=>x.pilotId===pilot.id);const r2=b2.find(x=>x.pilotId===pilot.id);
@@ -539,7 +545,7 @@ function renderPresence(){
       const nP=rows.filter(r=>r.status==='present').length;
       const nA=rows.filter(r=>r.status==='absent').length;
       const nD=rows.filter(r=>r.status==='dcl').length;
-      html+=`<div style="margin-bottom:16px;"><div style="font-weight:800;font-size:14px;margin-bottom:8px;">${cat==='Dinos'?'🦕':'🐣'} ${cat}</div>
+      html+=`<div style="margin-bottom:16px;"><div style="font-weight:800;font-size:14px;margin-bottom:8px;">${cat==='Dinos'?'🦕':'🐣'} ${cat==='Dinos'?'DINOS SENIOR':'DINOS GRADUADOS'}</div>
         <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:13px;margin-bottom:10px;">
           <span style="color:#16a34a;">✅ Presentes: <strong>${nP}</strong></span>
           <span style="color:#dc2626;">❌ Ausentes: <strong>${nA}</strong></span>
@@ -560,15 +566,15 @@ function renderPilotList(){
   let html=`<div class="card"><div class="ct">🪖 Pilotos do Campeonato</div>
     <div class="stats">
       <div class="stc"><div class="stn">${G.data.pilots.length}</div><div class="stl">Total</div></div>
-      <div class="stc"><div class="stn">${dinos.length}</div><div class="stl">Dinos</div></div>
-      <div class="stc"><div class="stn">${baby.length}</div><div class="stl">Baby Dinos</div></div>
+      <div class="stc"><div class="stn">${dinos.length}</div><div class="stl">DINOS SENIOR</div></div>
+      <div class="stc"><div class="stn">${baby.length}</div><div class="stl">DINOS GRADUADOS</div></div>
     </div>
-    <div style="font-weight:900;font-size:14px;margin-bottom:10px;">🦕 Dinos — Senior</div>`;
+    <div style="font-weight:900;font-size:14px;margin-bottom:10px;">🦕 DINOS SENIOR</div>`;
   if(!dinos.length)html+=`<p style="color:#aaa;font-size:13px;margin-bottom:14px;">Nenhum piloto.</p>`;
-  dinos.forEach(p=>{html+=`<div class="li"><div style="display:flex;align-items:center;gap:12px;">${p.number?`<div class="pnum">${p.number}</div>`:'<div style="width:36px;height:36px;background:#f3f4f6;border-radius:50%;"></div>'}<strong>${p.name}</strong></div><span class="catd cd">Dinos</span></div>`;});
-  html+=`<div style="font-weight:900;font-size:14px;margin:16px 0 10px;">🐣 Baby Dinos — Graduados</div>`;
+  dinos.forEach(p=>{html+=`<div class="li"><div style="display:flex;align-items:center;gap:12px;">${p.number?`<div class="pnum">${p.number}</div>`:'<div style="width:36px;height:36px;background:#f3f4f6;border-radius:50%;"></div>'}<strong>${p.name}</strong></div><span class="catd cd">DINOS SENIOR</span></div>`;});
+  html+=`<div style="font-weight:900;font-size:14px;margin:16px 0 10px;">🐣 DINOS GRADUADOS</div>`;
   if(!baby.length)html+=`<p style="color:#aaa;font-size:13px;">Nenhum piloto.</p>`;
-  baby.forEach(p=>{html+=`<div class="li"><div style="display:flex;align-items:center;gap:12px;">${p.number?`<div class="pnum">${p.number}</div>`:'<div style="width:36px;height:36px;background:#f3f4f6;border-radius:50%;"></div>'}<strong>${p.name}</strong></div><span class="catd cb">Baby Dinos</span></div>`;});
+  baby.forEach(p=>{html+=`<div class="li"><div style="display:flex;align-items:center;gap:12px;">${p.number?`<div class="pnum">${p.number}</div>`:'<div style="width:36px;height:36px;background:#f3f4f6;border-radius:50%;"></div>'}<strong>${p.name}</strong></div><span class="catd cb">DINOS GRADUADOS</span></div>`;});
   return html+`</div>`;
 }
 
@@ -596,15 +602,15 @@ function renderAdmP(){
         <div class="f"><label>Nome</label><input type="text" id="pN" placeholder="Nome do piloto" required></div>
         <div class="frow">
           <div class="f"><label>Numero</label><input type="text" id="pNm" placeholder="Ex: 77"></div>
-          <div class="f"><label>Categoria</label><select id="pC"><option value="Dinos">Dinos (Senior)</option><option value="Baby Dinos">Baby Dinos (Graduados)</option></select></div>
+          <div class="f"><label>Categoria</label><select id="pC"><option value="Dinos">DINOS SENIOR</option><option value="Baby Dinos">DINOS GRADUADOS</option></select></div>
         </div>
         <button type="submit" class="btn bg">➕ Adicionar</button>
       </form>
     </div>
-    <div style="font-weight:900;font-size:14px;margin-bottom:10px;">🦕 Dinos (${dinos.length})</div>
-    ${dinos.map(p=>`<div class="li"><div style="display:flex;align-items:center;gap:12px;">${p.number?`<div class="pnum">${p.number}</div>`:''}<div><strong>${p.name}</strong><br><span class="catd cd">Dinos</span></div></div><button class="dbtn" onclick="delPilot('${p.id}')">Excluir</button></div>`).join('')||'<p style="color:#aaa;margin-bottom:12px;">Nenhum.</p>'}
-    <div style="font-weight:900;font-size:14px;margin:16px 0 10px;">🐣 Baby Dinos (${baby.length})</div>
-    ${baby.map(p=>`<div class="li"><div style="display:flex;align-items:center;gap:12px;">${p.number?`<div class="pnum">${p.number}</div>`:''}<div><strong>${p.name}</strong><br><span class="catd cb">Baby Dinos</span></div></div><button class="dbtn" onclick="delPilot('${p.id}')">Excluir</button></div>`).join('')||'<p style="color:#aaa;">Nenhum.</p>'}
+    <div style="font-weight:900;font-size:14px;margin-bottom:10px;">🦕 DINOS SENIOR (${dinos.length})</div>
+    ${dinos.map(p=>`<div class="li"><div style="display:flex;align-items:center;gap:12px;">${p.number?`<div class="pnum">${p.number}</div>`:''}<div><strong>${p.name}</strong><br><span class="catd cd">DINOS SENIOR</span></div></div><button class="dbtn" onclick="delPilot('${p.id}')">Excluir</button></div>`).join('')||'<p style="color:#aaa;margin-bottom:12px;">Nenhum.</p>'}
+    <div style="font-weight:900;font-size:14px;margin:16px 0 10px;">🐣 DINOS GRADUADOS (${baby.length})</div>
+    ${baby.map(p=>`<div class="li"><div style="display:flex;align-items:center;gap:12px;">${p.number?`<div class="pnum">${p.number}</div>`:''}<div><strong>${p.name}</strong><br><span class="catd cb">DINOS GRADUADOS</span></div></div><button class="dbtn" onclick="delPilot('${p.id}')">Excluir</button></div>`).join('')||'<p style="color:#aaa;">Nenhum.</p>'}
   </div>`;
 }
 
@@ -688,8 +694,8 @@ function renderEdit(){
       <button class="tab ${tab==='battery2'?'active':''}" onclick="setTab('battery2')">🏁 2ª Bateria</button>
     </div>
     <div class="tabs" style="margin-top:-8px;">
-      <button class="tab ${cat==='Dinos'?'active':''}" onclick="setCat('Dinos')">🦕 Dinos</button>
-      <button class="tab ${cat==='Baby Dinos'?'active':''}" onclick="setCat('Baby Dinos')">🐣 Baby Dinos</button>
+      <button class="tab ${cat==='Dinos'?'active':''}" onclick="setCat('Dinos')">🦕 DINOS SENIOR</button>
+      <button class="tab ${cat==='Baby Dinos'?'active':''}" onclick="setCat('Baby Dinos')">🐣 DINOS GRADUADOS</button>
     </div>
     ${body}
   </div></div>`;
