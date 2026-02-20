@@ -228,7 +228,7 @@ function toggleDcl(bn,pid){
 function ensureDataCompat(){
   G.data.stages.forEach(stage=>{
     ['battery1','battery2'].forEach(bk=>{
-      ['Dinos','Baby Dinos'].forEach(cat=>{
+      ['Dinos','Dinos  GRADUADOS'].forEach(cat=>{
         if(stage[bk]&&stage[bk][cat]){
           stage[bk][cat]=stage[bk][cat].map(r=>{
             if(!r.pointsBase&&r.points){
