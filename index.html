@@ -211,6 +211,49 @@ function delPartnerLogo(id){if(!confirm('Remover logo?'))return;G.data.partnerLo
 
 function getCatLabel(cat){return cat==='Dinos'?'DINOS SENIOR':'DINOS GRADUADOS';}
 
+
+// ===== BACKUP AUTOMÁTICO =====
+let lastBackupTime = DB.get('last_backup_time') || 0;
+
+function checkAutoBackup(){
+  const now = Date.now();
+  const oneDay = 24 * 60 * 60 * 1000; // 24 horas
+  
+  // Se passou mais de 24h desde último backup, fazer backup
+  if(now - lastBackupTime > oneDay && G.user && G.user.role === 'admin'){
+    const doBackup = confirm('⚠️ BACKUP AUTOMÁTICO\n\nFaz mais de 24 horas desde o último backup.\n\nDeseja fazer backup agora?\n(Recomendado para não perder dados)');
+    if(doBackup){
+      autoBackup();
+    } else {
+      // Adiar por 6 horas
+      lastBackupTime = now - (oneDay - 6*60*60*1000);
+      DB.set('last_backup_time', lastBackupTime);
+    }
+  }
+}
+
+function autoBackup(){
+  try {
+    const blob = new Blob([JSON.stringify(G.data, null, 2)], {type: 'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'kart-backup-AUTO-' + new Date().toISOString().slice(0,10) + '.json';
+    a.click();
+    lastBackupTime = Date.now();
+    DB.set('last_backup_time', lastBackupTime);
+    alert('✅ Backup automático realizado!\n\nArquivo: ' + a.download);
+  } catch(e) {
+    console.error('Erro no backup:', e);
+  }
+}
+
+// Verificar backup a cada renderização (se admin)
+function checkBackupOnRender(){
+  if(G.user && G.user.role === 'admin'){
+    setTimeout(checkAutoBackup, 1000); // Aguardar 1s após render
+  }
+}
+
 // ===== FUNÇÕES AUXILIARES PARA INTERFACE =====
 function updatePtsPreview(bn,pid){
   const pos=parseInt(document.getElementById('bp'+bn+'_'+pid).value)||0;
@@ -445,8 +488,8 @@ function renderStandings(){
   tbl+=`</tbody></table></div>`;
   return `<div class="card"><div class="ct">🏆 Ranking Geral</div>
     <div class="tabs">
-      <button class="tab ${cat==='Dinos'?'active':''}" onclick="G.standCat='Dinos';render()">🦖 DINOS SENIOR</button>
-      <button class="tab ${cat==='Baby Dinos'?'active':''}" onclick="G.standCat='Baby Dinos';render()">🦕 DINOS GRADUADOS</button>
+      <button class="tab ${cat==='Dinos'?'active':''}" onclick="G.standCat='Dinos';render()">🦕 DINOS SENIOR</button>
+      <button class="tab ${cat==='Baby Dinos'?'active':''}" onclick="G.standCat='Baby Dinos';render()">🐣 DINOS GRADUADOS</button>
     </div>${pod}${tbl}</div>`;
 }
 
@@ -499,8 +542,8 @@ function renderStageView(){
   }
   return `<div class="card"><div class="ct">📋 Ranking das Etapas</div>
     <div class="tabs">
-      <button class="tab ${cat==='Dinos'?'active':''}" onclick="G.viewCat='Dinos';render()">🦖 DINOS SENIOR</button>
-      <button class="tab ${cat==='Baby Dinos'?'active':''}" onclick="G.viewCat='Baby Dinos';render()">🦕 DINOS GRADUADOS</button>
+      <button class="tab ${cat==='Dinos'?'active':''}" onclick="G.viewCat='Dinos';render()">🦕 DINOS SENIOR</button>
+      <button class="tab ${cat==='Baby Dinos'?'active':''}" onclick="G.viewCat='Baby Dinos';render()">🐣 DINOS GRADUADOS</button>
     </div>
     <p style="font-size:13px;color:#888;margin-bottom:14px;">Toque em uma etapa para expandir.</p>
     ${cards}</div>`;
@@ -511,7 +554,7 @@ function renderBestLaps(){
   let html='';
   ['Dinos','Baby Dinos'].forEach(cat=>{
         const catLabel=cat==='Dinos'?'DINOS SENIOR':'DINOS GRADUADOS';
-    html+=`<div style="margin-bottom:22px;"><div style="font-weight:900;font-size:15px;margin-bottom:10px;">${cat==='Dinos'?'🦖':'🦕'} ${cat==='Dinos'?'DINOS SENIOR':'DINOS GRADUADOS'}</div>`;
+    html+=`<div style="margin-bottom:22px;"><div style="font-weight:900;font-size:15px;margin-bottom:10px;">${cat==='Dinos'?'🦕':'🐣'} ${cat==='Dinos'?'DINOS SENIOR':'DINOS GRADUADOS'}</div>`;
     let found=false;
     G.data.stages.forEach(stage=>{
       const allB=[...(stage.battery1[cat]||[]),...(stage.battery2[cat]||[])].filter(b=>b.bestLap&&!b.disqualified&&!b.didNotParticipate);
@@ -545,7 +588,7 @@ function renderPresence(){
       const nP=rows.filter(r=>r.status==='present').length;
       const nA=rows.filter(r=>r.status==='absent').length;
       const nD=rows.filter(r=>r.status==='dcl').length;
-      html+=`<div style="margin-bottom:16px;"><div style="font-weight:800;font-size:14px;margin-bottom:8px;">${cat==='Dinos'?'🦖':'🦕'} ${cat==='Dinos'?'DINOS SENIOR':'DINOS GRADUADOS'}</div>
+      html+=`<div style="margin-bottom:16px;"><div style="font-weight:800;font-size:14px;margin-bottom:8px;">${cat==='Dinos'?'🦕':'🐣'} ${cat==='Dinos'?'DINOS SENIOR':'DINOS GRADUADOS'}</div>
         <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:13px;margin-bottom:10px;">
           <span style="color:#16a34a;">✅ Presentes: <strong>${nP}</strong></span>
           <span style="color:#dc2626;">❌ Ausentes: <strong>${nA}</strong></span>
@@ -569,10 +612,10 @@ function renderPilotList(){
       <div class="stc"><div class="stn">${dinos.length}</div><div class="stl">DINOS SENIOR</div></div>
       <div class="stc"><div class="stn">${baby.length}</div><div class="stl">DINOS GRADUADOS</div></div>
     </div>
-    <div style="font-weight:900;font-size:14px;margin-bottom:10px;">🦖 DINOS SENIOR</div>`;
+    <div style="font-weight:900;font-size:14px;margin-bottom:10px;">🦕 DINOS SENIOR</div>`;
   if(!dinos.length)html+=`<p style="color:#aaa;font-size:13px;margin-bottom:14px;">Nenhum piloto.</p>`;
   dinos.forEach(p=>{html+=`<div class="li"><div style="display:flex;align-items:center;gap:12px;">${p.number?`<div class="pnum">${p.number}</div>`:'<div style="width:36px;height:36px;background:#f3f4f6;border-radius:50%;"></div>'}<strong>${p.name}</strong></div><span class="catd cd">DINOS SENIOR</span></div>`;});
-  html+=`<div style="font-weight:900;font-size:14px;margin:16px 0 10px;">🦕 DINOS GRADUADOS</div>`;
+  html+=`<div style="font-weight:900;font-size:14px;margin:16px 0 10px;">🐣 DINOS GRADUADOS</div>`;
   if(!baby.length)html+=`<p style="color:#aaa;font-size:13px;">Nenhum piloto.</p>`;
   baby.forEach(p=>{html+=`<div class="li"><div style="display:flex;align-items:center;gap:12px;">${p.number?`<div class="pnum">${p.number}</div>`:'<div style="width:36px;height:36px;background:#f3f4f6;border-radius:50%;"></div>'}<strong>${p.name}</strong></div><span class="catd cb">DINOS GRADUADOS</span></div>`;});
   return html+`</div>`;
@@ -607,9 +650,9 @@ function renderAdmP(){
         <button type="submit" class="btn bg">➕ Adicionar</button>
       </form>
     </div>
-    <div style="font-weight:900;font-size:14px;margin-bottom:10px;">🦖 DINOS SENIOR (${dinos.length})</div>
+    <div style="font-weight:900;font-size:14px;margin-bottom:10px;">🦕 DINOS SENIOR (${dinos.length})</div>
     ${dinos.map(p=>`<div class="li"><div style="display:flex;align-items:center;gap:12px;">${p.number?`<div class="pnum">${p.number}</div>`:''}<div><strong>${p.name}</strong><br><span class="catd cd">DINOS SENIOR</span></div></div><button class="dbtn" onclick="delPilot('${p.id}')">Excluir</button></div>`).join('')||'<p style="color:#aaa;margin-bottom:12px;">Nenhum.</p>'}
-    <div style="font-weight:900;font-size:14px;margin:16px 0 10px;">🦕 DINOS GRADUADOS (${baby.length})</div>
+    <div style="font-weight:900;font-size:14px;margin:16px 0 10px;">🐣 DINOS GRADUADOS (${baby.length})</div>
     ${baby.map(p=>`<div class="li"><div style="display:flex;align-items:center;gap:12px;">${p.number?`<div class="pnum">${p.number}</div>`:''}<div><strong>${p.name}</strong><br><span class="catd cb">DINOS GRADUADOS</span></div></div><button class="dbtn" onclick="delPilot('${p.id}')">Excluir</button></div>`).join('')||'<p style="color:#aaa;">Nenhum.</p>'}
   </div>`;
 }
@@ -694,8 +737,8 @@ function renderEdit(){
       <button class="tab ${tab==='battery2'?'active':''}" onclick="setTab('battery2')">🏁 2ª Bateria</button>
     </div>
     <div class="tabs" style="margin-top:-8px;">
-      <button class="tab ${cat==='Dinos'?'active':''}" onclick="setCat('Dinos')">🦖 DINOS SENIOR</button>
-      <button class="tab ${cat==='Baby Dinos'?'active':''}" onclick="setCat('Baby Dinos')">🦕 DINOS GRADUADOS</button>
+      <button class="tab ${cat==='Dinos'?'active':''}" onclick="setCat('Dinos')">🦕 DINOS SENIOR</button>
+      <button class="tab ${cat==='Baby Dinos'?'active':''}" onclick="setCat('Baby Dinos')">🐣 DINOS GRADUADOS</button>
     </div>
     ${body}
   </div></div>`;
@@ -848,7 +891,7 @@ function render(){
   const bar=G.user.role==='pilot'?`<div class="readonly-bar">👁 Modo Visualização — Somente Leitura</div>`:'';
   el.innerHTML=`<div class="wrap">${renderHeader()}${renderNav()}${bar}${content}</div>`;
 }
-setTimeout(()=>render(),50);
+setTimeout(()=>{render();checkBackupOnRender();},50);
 </script>
 </body>
 </html>
